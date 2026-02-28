@@ -13,7 +13,7 @@ Developer | Problem Solver | Continuous Learner<br>Passionate about building pra
 ![](https://github-readme-stats.vercel.app/api/top-langs/?username=Atharv3142M&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
 
 ## 🏆 GitHub Trophies
-![](https://github-profile-trophy.vercel.app/?username=Atharv3142M&theme=radical&no-frame=false&no-bg=true&margin-w=4)
+![](https://github-profile-trophy-tawny.vercel.app/?username=Atharv3142M&theme=radical&no-frame=false&no-bg=true&margin-w=4])
 
 ### ✍️ Random Dev Quote
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=radical)
@@ -22,6 +22,6 @@ Developer | Problem Solver | Continuous Learner<br>Passionate about building pra
 ![](https://github-contributor-stats.vercel.app/api?username=Atharv3142M&limit=5&theme=dark&combine_all_yearly_contributions=true)
 
 ---
-[![](https://visitcount.itsvg.in/api?id=Atharv3142M&icon=0&color=0)](https://visitcount.itsvg.in)
 
-<!-- Proudly created with GPRM ( https://gprm.itsvg.in ) -->
+[![An image of @atharv3142m's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/atharv3142m)](https://holopin.io/@atharv3142m)
+

@@ -512,53 +512,73 @@ html, body {
    APP: SKILLS
    ═══════════════════════════════════════════════════════════ */
 .app-skills { padding: 0; }
-.skills-layout { display: flex; height: 100%; min-height: 0; }
+.skills-layout {
+  display: flex; flex-direction: row; height: 100%; min-height: 0;
+  overflow: hidden;
+}
 
 .skills-sidebar {
-  width: 150px; min-width: 150px;
+  width: 170px; min-width: 170px;
   border-right: 1px solid var(--border);
   padding: 8px 6px;
   overflow-y: auto;
   flex-shrink: 0;
+  background: rgba(0,0,0,0.12);
 }
 .skills-sidebar::-webkit-scrollbar { width: 3px; }
 .skills-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
 
-.skills-main { flex: 1; padding: 16px; overflow-y: auto; }
+.skills-main {
+  flex: 1; padding: 20px;
+  overflow-y: auto;
+  min-height: 0;
+  min-width: 0;
+}
 .skills-main::-webkit-scrollbar { width: 4px; }
 .skills-main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 
 .sidebar-item {
-  padding: 5px 8px; border-radius: 3px;
-  font-size: 11px; color: var(--text-secondary);
+  padding: 7px 10px; border-radius: 4px;
+  font-size: 11.5px; color: var(--text-secondary);
   cursor: pointer; transition: all 0.1s;
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 1px;
 }
 .sidebar-item:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-.sidebar-item.active { background: var(--kali-blue-dim); color: var(--kali-blue-light); }
+.sidebar-item.active { background: var(--kali-blue-dim); color: var(--kali-blue-light); font-weight: 500; }
 
-.sidebar-icon { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
+.sidebar-icon {
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+.sidebar-icon svg { width: 14px; height: 14px; }
 
 .skills-cat-title {
-  font-size: 10px; font-weight: 600;
+  font-size: 11px; font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase; letter-spacing: 0.08em;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
 }
+.skills-cat-title svg { width: 16px; height: 16px; }
 
-.skills-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.skills-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .skill-pill {
-  padding: 4px 10px; border-radius: 3px;
-  font-size: 11px; color: var(--text-secondary);
+  padding: 5px 12px; border-radius: 4px;
+  font-size: 11.5px; color: var(--text-secondary);
   border: 1px solid var(--border-strong);
   background: rgba(255,255,255,0.02);
   transition: all 0.12s; cursor: default;
+  line-height: 1.3;
 }
 .skill-pill:hover {
   background: var(--kali-blue-dim);
   color: var(--kali-blue-light);
   border-color: rgba(54,123,240,0.3);
+  transform: translateY(-1px);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -842,7 +862,7 @@ html, body {
   transition: background 0.08s;
 }
 .menu-item:hover { background: rgba(54,123,240,0.15); color: var(--text-primary); }
-.menu-item-icon { font-size: 14px; width: 22px; text-align: center; flex-shrink: 0; }
+.menu-item-icon { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
 .menu-sep { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
 
@@ -961,8 +981,8 @@ html, body {
   .stat-row { grid-template-columns: 1fr 1fr 1fr; }
   .projects-grid { grid-template-columns: 1fr; }
 
-  .skills-sidebar { width: 120px; min-width: 120px; }
-  .sidebar-item { font-size: 10px; padding: 4px 6px; }
+  .skills-sidebar { width: 130px; min-width: 130px; }
+  .sidebar-item { font-size: 10px; padding: 5px 8px; }
 }
 
 @media (max-width: 480px) {
@@ -970,7 +990,7 @@ html, body {
   .about-hero { flex-direction: column; text-align: center; }
   .about-links { justify-content: center; }
   .dock-icon { width: 32px; height: 32px; font-size: 18px; }
-  .skills-sidebar { width: 100px; min-width: 100px; }
+  .skills-sidebar { width: 110px; min-width: 110px; }
 }
 </style>
 </head>
@@ -1035,17 +1055,17 @@ html, body {
     </div>
   </div>
   <div class="menu-section-label">Applications</div>
-  <div class="menu-item" onclick="openApp('about');toggleAppMenu()"><div class="menu-item-icon">👤</div>About Me</div>
-  <div class="menu-item" onclick="openApp('projects');toggleAppMenu()"><div class="menu-item-icon">📁</div>Projects</div>
-  <div class="menu-item" onclick="openApp('skills');toggleAppMenu()"><div class="menu-item-icon">⚡</div>Skills & Tools</div>
-  <div class="menu-item" onclick="openApp('stats');toggleAppMenu()"><div class="menu-item-icon">📊</div>GitHub Stats</div>
-  <div class="menu-item" onclick="openApp('certs');toggleAppMenu()"><div class="menu-item-icon">🏆</div>Certifications</div>
-  <div class="menu-item" onclick="openApp('terminal');toggleAppMenu()"><div class="menu-item-icon" style="font-family:var(--font-mono);font-size:12px">$_</div>Terminal</div>
-  <div class="menu-item" onclick="openApp('contact');toggleAppMenu()"><div class="menu-item-icon">✉️</div>Contact</div>
+  <div class="menu-item" onclick="openApp('about');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>About Me</div>
+  <div class="menu-item" onclick="openApp('projects');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>Projects</div>
+  <div class="menu-item" onclick="openApp('skills');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>Skills & Tools</div>
+  <div class="menu-item" onclick="openApp('stats');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>GitHub Stats</div>
+  <div class="menu-item" onclick="openApp('certs');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>Certifications</div>
+  <div class="menu-item" onclick="openApp('terminal');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>Terminal</div>
+  <div class="menu-item" onclick="openApp('contact');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>Contact</div>
   <div class="menu-sep"></div>
   <div class="menu-section-label">Links</div>
-  <div class="menu-item" onclick="window.open('https://github.com/Atharv3142M','_blank');toggleAppMenu()"><div class="menu-item-icon">⎇</div>Open GitHub</div>
-  <div class="menu-item" onclick="window.open('https://linkedin.com/in/atharv-pose','_blank');toggleAppMenu()"><div class="menu-item-icon" style="font-size:11px;font-weight:700">in</div>Open LinkedIn</div>
+  <div class="menu-item" onclick="window.open('https://github.com/Atharv3142M','_blank');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></div>Open GitHub</div>
+  <div class="menu-item" onclick="window.open('https://linkedin.com/in/atharv-pose','_blank');toggleAppMenu()"><div class="menu-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></div>Open LinkedIn</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -1053,27 +1073,27 @@ html, body {
      ═══════════════════════════════════════════════════════════ -->
 <div id="desktop-icons">
   <div class="desk-icon" ondblclick="openApp('about')">
-    <div class="desk-icon-img">👤</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
     <span class="desk-icon-label">About Me</span>
   </div>
   <div class="desk-icon" ondblclick="openApp('projects')">
-    <div class="desk-icon-img">📁</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
     <span class="desk-icon-label">Projects</span>
   </div>
   <div class="desk-icon" ondblclick="openApp('skills')">
-    <div class="desk-icon-img">⚡</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
     <span class="desk-icon-label">Skills</span>
   </div>
   <div class="desk-icon" ondblclick="openApp('terminal')">
-    <div class="desk-icon-img" style="font-family:var(--font-mono);font-size:18px">$_</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
     <span class="desk-icon-label">Terminal</span>
   </div>
   <div class="desk-icon" ondblclick="openApp('stats')">
-    <div class="desk-icon-img">📊</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
     <span class="desk-icon-label">GitHub</span>
   </div>
   <div class="desk-icon" ondblclick="openApp('contact')">
-    <div class="desk-icon-img">✉️</div>
+    <div class="desk-icon-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
     <span class="desk-icon-label">Contact</span>
   </div>
 </div>
@@ -1085,7 +1105,7 @@ html, body {
 <!-- ABOUT -->
 <div id="win-about" class="window" style="width:520px;height:500px;top:60px;left:140px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-about')" ontouchstart="startDragTouch(event,'win-about')">
-    <div class="titlebar-title">👤 About — Atharv Pose</div>
+    <div class="titlebar-title">About — Atharv Pose</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('about')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-about')">☐</button>
@@ -1125,7 +1145,7 @@ html, body {
 <!-- PROJECTS -->
 <div id="win-projects" class="window" style="width:640px;height:500px;top:70px;left:180px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-projects')" ontouchstart="startDragTouch(event,'win-projects')">
-    <div class="titlebar-title">📁 Projects — Atharv3142M</div>
+    <div class="titlebar-title">Projects — Atharv3142M</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('projects')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-projects')">☐</button>
@@ -1141,7 +1161,7 @@ html, body {
 <!-- SKILLS -->
 <div id="win-skills" class="window" style="width:620px;height:460px;top:80px;left:200px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-skills')" ontouchstart="startDragTouch(event,'win-skills')">
-    <div class="titlebar-title">⚡ Skills & Tools</div>
+    <div class="titlebar-title">Skills & Tools</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('skills')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-skills')">☐</button>
@@ -1158,7 +1178,7 @@ html, body {
 <!-- GITHUB STATS -->
 <div id="win-stats" class="window" style="width:560px;height:500px;top:65px;left:170px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-stats')" ontouchstart="startDragTouch(event,'win-stats')">
-    <div class="titlebar-title">📊 GitHub — Atharv3142M</div>
+    <div class="titlebar-title">GitHub — Atharv3142M</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('stats')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-stats')">☐</button>
@@ -1204,7 +1224,7 @@ html, body {
 <!-- CERTIFICATIONS -->
 <div id="win-certs" class="window" style="width:500px;height:460px;top:70px;left:160px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-certs')" ontouchstart="startDragTouch(event,'win-certs')">
-    <div class="titlebar-title">🏆 Certifications & Education</div>
+    <div class="titlebar-title">Certifications & Education</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('certs')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-certs')">☐</button>
@@ -1220,7 +1240,7 @@ html, body {
 <!-- CONTACT -->
 <div id="win-contact" class="window" style="width:440px;height:420px;top:80px;left:220px;z-index:20;display:none">
   <div class="titlebar" onmousedown="startDrag(event,'win-contact')" ontouchstart="startDragTouch(event,'win-contact')">
-    <div class="titlebar-title">✉️ Contact — Atharv Pose</div>
+    <div class="titlebar-title">Contact — Atharv Pose</div>
     <div class="titlebar-btns">
       <button class="win-btn" onclick="minimizeApp('contact')">─</button>
       <button class="win-btn" onclick="maximizeApp('win-contact')">☐</button>
@@ -1263,32 +1283,32 @@ html, body {
 <div id="dock-wrapper">
   <div id="dock">
     <div class="dock-item" data-tooltip="Terminal" onclick="openApp('terminal')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,#1a1a2e,#0c0c14);border:1px solid rgba(85,255,85,0.2);font-family:var(--font-mono);font-size:16px;color:var(--term-green)">$_</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,#1a1a2e,#0c0c14);border:1px solid rgba(85,255,85,0.2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#55ff55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
       <div class="dock-dot" id="dock-dot-terminal"></div>
     </div>
     <div class="dock-item" data-tooltip="About Me" onclick="openApp('about')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(54,123,240,0.3),rgba(30,30,62,0.8));border:1px solid rgba(54,123,240,0.3)">👤</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(54,123,240,0.3),rgba(30,30,62,0.8));border:1px solid rgba(54,123,240,0.3)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5eaeff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <div class="dock-dot" id="dock-dot-about"></div>
     </div>
     <div class="dock-item" data-tooltip="Projects" onclick="openApp('projects')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(255,184,108,0.2),rgba(30,30,62,0.8));border:1px solid rgba(255,184,108,0.2)">📁</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(255,184,108,0.2),rgba(30,30,62,0.8));border:1px solid rgba(255,184,108,0.2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffb86c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg></div>
       <div class="dock-dot" id="dock-dot-projects"></div>
     </div>
     <div class="dock-item" data-tooltip="Skills" onclick="openApp('skills')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(241,250,140,0.15),rgba(30,30,62,0.8));border:1px solid rgba(241,250,140,0.2)">⚡</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(241,250,140,0.15),rgba(30,30,62,0.8));border:1px solid rgba(241,250,140,0.2)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f1fa8c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
       <div class="dock-dot" id="dock-dot-skills"></div>
     </div>
     <div class="dock-sep"></div>
     <div class="dock-item" data-tooltip="GitHub Stats" onclick="openApp('stats')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(85,255,85,0.15),rgba(30,30,62,0.8));border:1px solid rgba(85,255,85,0.15)">📊</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(85,255,85,0.15),rgba(30,30,62,0.8));border:1px solid rgba(85,255,85,0.15)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#55ff55" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
       <div class="dock-dot" id="dock-dot-stats"></div>
     </div>
     <div class="dock-item" data-tooltip="Certifications" onclick="openApp('certs')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(255,85,85,0.15),rgba(30,30,62,0.8));border:1px solid rgba(255,85,85,0.15)">🏆</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(255,85,85,0.15),rgba(30,30,62,0.8));border:1px solid rgba(255,85,85,0.15)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff5555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
       <div class="dock-dot" id="dock-dot-certs"></div>
     </div>
     <div class="dock-item" data-tooltip="Contact" onclick="openApp('contact')">
-      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(139,233,253,0.15),rgba(30,30,62,0.8));border:1px solid rgba(139,233,253,0.15)">✉️</div>
+      <div class="dock-icon" style="background:linear-gradient(135deg,rgba(139,233,253,0.15),rgba(30,30,62,0.8));border:1px solid rgba(139,233,253,0.15)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8be9fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
       <div class="dock-dot" id="dock-dot-contact"></div>
     </div>
   </div>
@@ -1329,32 +1349,41 @@ const PROJECTS = [
   { name:'E-Commerce Sneakers', desc:'E-Commerce sneakers store frontend', lang:'HTML', url:'https://github.com/Atharv3142M/E-Commerce_SneakersStore', stars:0, fork:false },
   { name:'MSSU-Hackathon-2025', desc:'MSSU Hackathon 2025 project', lang:'Python', url:'https://github.com/Atharv3142M/MSSU-Hackathon-2025', stars:0, fork:false },
   { name:'Java-Mini-Project', desc:'Java Mini Project 2k25', lang:'HTML', url:'https://github.com/Atharv3142M/Java-Mini-Project', stars:0, fork:false },
-  // Contributed / forked
-  { name:'hackingtool', desc:'ALL IN ONE Hacking Tool For Hackers', lang:'Python', url:'https://github.com/Atharv3142M/hackingtool', stars:0, fork:true },
-  { name:'it-tools', desc:'Collection of handy online tools for developers, with great UX', lang:'TypeScript', url:'https://github.com/Atharv3142M/it-tools', stars:0, fork:true },
-  { name:'gpt-ai-assistant', desc:'OpenAI + LINE + Vercel = GPT AI Assistant', lang:'JavaScript', url:'https://github.com/Atharv3142M/gpt-ai-assistant', stars:0, fork:true },
-  { name:'College-ERP', desc:'College management system with Django — attendance, marks, timetable', lang:'Python', url:'https://github.com/Atharv3142M/College-ERP', stars:0, fork:true },
-  { name:'Django-WebApp', desc:'Web app for file upload/download/sharing built with Django', lang:'Python', url:'https://github.com/Atharv3142M/Django-WebApp', stars:0, fork:true },
-  { name:'MoneyPrinterV2', desc:'Automate the process of making money online', lang:'Python', url:'https://github.com/Atharv3142M/MoneyPrinterV2', stars:0, fork:true },
-  { name:'ai-engineering-hub', desc:'AI Engineering hub — curated resources', lang:'Python', url:'https://github.com/Atharv3142M/ai-engineering-hub', stars:0, fork:true },
-  { name:'spotify-web-ui-clone', desc:'Spotify Web UI replica using Next.js, Tailwind CSS, Radix UI', lang:'TypeScript', url:'https://github.com/Atharv3142M/spotify-web-ui-clone', stars:0, fork:true },
-  { name:'uBlock', desc:'uBlock Origin — efficient content blocker for Chromium & Firefox', lang:'JavaScript', url:'https://github.com/Atharv3142M/uBlock', stars:0, fork:true },
+  // Contributed (actual contributions to other people's repos)
+  { name:'ai-hygiene-extension', desc:'Browser Extension for students to learn safe online behavior through gamification', lang:'TypeScript', url:'https://github.com/Bonsai05/ai-hygiene-extension', stars:0, fork:true, owner:'Bonsai05' },
 ];
 
 // ── SKILLS (add/remove categories or items freely) ──
+// SVG icon helper
+const _i = (d,s=14) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const IC = {
+  code:    _i('<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'),
+  layout:  _i('<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>'),
+  server:  _i('<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>'),
+  db:      _i('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>'),
+  cloud:   _i('<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>'),
+  cpu:     _i('<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
+  git:     _i('<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/>'),
+  shield:  _i('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'),
+  pen:     _i('<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>'),
+  gamepad: _i('<line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/><path d="M17.32 5H6.68a4 4 0 00-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 003 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 019.828 16h4.344a2 2 0 011.414.586L17 18c.5.5 1 1 2 1a3 3 0 003-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0017.32 5z"/>'),
+  monitor: _i('<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>'),
+  zap:     _i('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+};
+
 const SKILLS = {
-  'Languages':  { icon:'{ }', items:['Python','JavaScript','Java','HTML5','CSS3','Bash','PowerShell','C','Dart','Markdown'] },
-  'Frontend':   { icon:'🖼',  items:['Next.js','React','TailwindCSS','Flutter','Streamlit','WordPress','Figma'] },
-  'Backend':    { icon:'⚙',  items:['Node.js','Django','Flask','NPM'] },
-  'Databases':  { icon:'🗄',  items:['MongoDB','PostgreSQL','MySQL','SQLite','Supabase','Firebase','DBMS'] },
-  'Cloud':      { icon:'☁',  items:['AWS','Google Cloud','Oracle Cloud','Netlify','Vercel','Heroku','Firebase','Azure AI Services'] },
-  'AI / ML':    { icon:'🤖', items:['TensorFlow','PyTorch','Keras','scikit-learn','OpenCV','NumPy','Pandas','Matplotlib','MLflow','CUDA','ChatGPT','Generative AI'] },
-  'DevOps':     { icon:'🔧', items:['Docker','Kubernetes','Git','GitHub','Arduino','Raspberry Pi','Linux','Ubuntu'] },
-  'Security':   { icon:'🔒', items:['OSINT','Tor','Ethical AI','Bitwarden','Cisco'] },
-  'Creative':   { icon:'🎨', items:['Blender','Adobe Premiere Pro','Adobe Photoshop','After Effects','Lightroom','Canva','Aseprite','Photography','Video Editing','Image Editing'] },
-  'Game Dev':   { icon:'🎮', items:['Unity','Unreal Engine','Godot','Game Dev','Video Games'] },
-  'IT Support': { icon:'🖥',  items:['Hardware Diagnostics','Computer Repair','Remote Troubleshooting','IT Hardware Support','Computer Maintenance','Software Installation','Software Documentation','AutoCAD'] },
-  'Other':      { icon:'⚡', items:['Home Assistant','Jellyfin','Plex','Notion','FFmpeg','Zigbee','Tampermonkey','Vibe Coding','Analytical Skills','Research Skills','Problem Solving'] },
+  'Languages':  { icon:IC.code,    items:['Python','JavaScript','Java','HTML5','CSS3','Bash','PowerShell','C','Dart','Markdown'] },
+  'Frontend':   { icon:IC.layout,  items:['Next.js','React','TailwindCSS','Flutter','Streamlit','WordPress','Figma'] },
+  'Backend':    { icon:IC.server,  items:['Node.js','Django','Flask','NPM'] },
+  'Databases':  { icon:IC.db,      items:['MongoDB','PostgreSQL','MySQL','SQLite','Supabase','Firebase','DBMS'] },
+  'Cloud':      { icon:IC.cloud,   items:['AWS','Google Cloud','Oracle Cloud','Netlify','Vercel','Heroku','Firebase','Azure AI Services'] },
+  'AI / ML':    { icon:IC.cpu,     items:['TensorFlow','PyTorch','Keras','scikit-learn','OpenCV','NumPy','Pandas','Matplotlib','MLflow','CUDA','ChatGPT','Generative AI'] },
+  'DevOps':     { icon:IC.git,     items:['Docker','Kubernetes','Git','GitHub','Arduino','Raspberry Pi','Linux','Ubuntu'] },
+  'Security':   { icon:IC.shield,  items:['OSINT','Tor','Ethical AI','Bitwarden','Cisco'] },
+  'Creative':   { icon:IC.pen,     items:['Blender','Adobe Premiere Pro','Adobe Photoshop','After Effects','Lightroom','Canva','Aseprite','Photography','Video Editing','Image Editing'] },
+  'Game Dev':   { icon:IC.gamepad, items:['Unity','Unreal Engine','Godot','Game Dev','Video Games'] },
+  'IT Support': { icon:IC.monitor, items:['Hardware Diagnostics','Computer Repair','Remote Troubleshooting','IT Hardware Support','Computer Maintenance','Software Installation','Software Documentation','AutoCAD'] },
+  'Other':      { icon:IC.zap,     items:['Home Assistant','Jellyfin','Plex','Notion','FFmpeg','Zigbee','Tampermonkey','Vibe Coding','Analytical Skills','Research Skills','Problem Solving'] },
 };
 
 // ── CERTIFICATIONS ──
@@ -1418,7 +1447,7 @@ function renderProjects() {
         <a class="project-card" href="${p.url}" target="_blank" rel="noopener">
           <div class="project-name">
             ${p.name}
-            ${p.fork ? '<span class="project-fork-badge">Fork</span>' : ''}
+            ${p.fork ? '<span class="project-fork-badge">' + (p.owner ? 'Contrib @ ' + p.owner : 'Contrib') + '</span>' : ''}
           </div>
           <div class="project-desc">${p.desc || 'No description'}</div>
           <div class="project-meta">
@@ -1453,10 +1482,11 @@ catKeys.forEach((cat, i) => {
 
 function showSkillsCat(cat) {
   const d = SKILLS[cat];
-  mainContent.innerHTML = `
-    <div class="skills-cat-title">${d.icon} ${cat}</div>
-    <div class="skills-tags">${d.items.map(t => `<span class="skill-pill">${t}</span>`).join('')}</div>
-  `;
+  if (!d) return;
+  const el = document.getElementById('skills-main-content');
+  if (!el) return;
+  const pillsHtml = d.items.map(function(t) { return '<span class="skill-pill">' + t + '</span>'; }).join('');
+  el.innerHTML = '<div class="skills-cat-title">' + d.icon + ' ' + cat + '</div><div class="skills-tags">' + pillsHtml + '</div>';
 }
 showSkillsCat(catKeys[0]);
 
@@ -1527,6 +1557,7 @@ function openApp(id) {
   if (id === 'terminal') initTerminal();
   if (id === 'stats') animCounters();
   if (id === 'projects') renderProjects();
+  if (id === 'skills') showSkillsCat(document.querySelector('.sidebar-item.active')?.dataset.cat || catKeys[0]);
 }
 
 function closeApp(id) {

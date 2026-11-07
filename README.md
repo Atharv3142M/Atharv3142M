@@ -1,27 +1,161 @@
-# 💫 About Me:
-Developer | Problem Solver | Continuous Learner<br>Passionate about building practical solutions with clean and efficient code.<br>I like learning new tools, improving existing systems, and building projects that have real impact.
+<!-- ATHARV POSE — GitHub Profile README -->
 
+<div align="center">
 
-## 🌐 Socials:
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://linkedin.com/in/atharv-pose) [![email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](mailto:atharvpose41@gmail.com) 
+<img src="https://capsule-render.vercel.app/api?type=venom&height=220&color=0:080B16,45:101B2D,100:163B4A&text=ATHARV%20POSE&fontColor=EAF6FF&fontSize=54&fontAlignY=48&desc=BUILD.%20BREAK.%20UNDERSTAND.%20REBUILD.&descAlignY=68&descSize=14&animation=fadeIn" width="100%" alt="Atharv Pose — Build. Break. Understand. Rebuild." />
 
-# 💻 Tech Stack:
-![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white) ![AssemblyScript](https://img.shields.io/badge/assembly%20script-%23000000.svg?style=for-the-badge&logo=assemblyscript&logoColor=white) ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white) ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white) ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E) ![Markdown](https://img.shields.io/badge/markdown-%23000000.svg?style=for-the-badge&logo=markdown&logoColor=white) ![PowerShell](https://img.shields.io/badge/PowerShell-%235391FE.svg?style=for-the-badge&logo=powershell&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) ![Bash Script](https://img.shields.io/badge/bash_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white) ![Windows Terminal](https://img.shields.io/badge/Windows%20Terminal-%234D4D4D.svg?style=for-the-badge&logo=windows-terminal&logoColor=white) ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white) ![Netlify](https://img.shields.io/badge/netlify-%23000000.svg?style=for-the-badge&logo=netlify&logoColor=#00C7B7) ![Oracle](https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white) ![Google Cloud](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white) ![Firebase](https://img.shields.io/badge/firebase-%23039BE5.svg?style=for-the-badge&logo=firebase) ![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white) ![Heroku](https://img.shields.io/badge/heroku-%23430098.svg?style=for-the-badge&logo=heroku&logoColor=white) ![Django](https://img.shields.io/badge/django-%23092E20.svg?style=for-the-badge&logo=django&logoColor=white) ![nVIDIA](https://img.shields.io/badge/cuda-000000.svg?style=for-the-badge&logo=nVIDIA&logoColor=green) ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white) ![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white) ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white) ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) ![OpenCV](https://img.shields.io/badge/opencv-%23white.svg?style=for-the-badge&logo=opencv&logoColor=white) ![Streamlit](https://img.shields.io/badge/Streamlit-%23FE4B4B.svg?style=for-the-badge&logo=streamlit&logoColor=white) ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white) ![WordPress](https://img.shields.io/badge/WordPress-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=white) ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34) ![MongoDB](https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white) ![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white) ![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white) ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white) ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white) ![Adobe After Effects](https://img.shields.io/badge/Adobe%20After%20Effects-9999FF.svg?style=for-the-badge&logo=Adobe%20After%20Effects&logoColor=white) ![Adobe Creative Cloud](https://img.shields.io/badge/Adobe%20Creative%20Cloud-DA1F26.svg?style=for-the-badge&logo=Adobe%20Creative%20Cloud&logoColor=white) ![Adobe](https://img.shields.io/badge/adobe-%23FF0000.svg?style=for-the-badge&logo=adobe&logoColor=white) ![Adobe Lightroom](https://img.shields.io/badge/Adobe%20Lightroom-31A8FF.svg?style=for-the-badge&logo=Adobe%20Lightroom&logoColor=white) ![Adobe Photoshop](https://img.shields.io/badge/adobe%20photoshop-%2331A8FF.svg?style=for-the-badge&logo=adobe%20photoshop&logoColor=white) ![Adobe Premiere Pro](https://img.shields.io/badge/Adobe%20Premiere%20Pro-9999FF.svg?style=for-the-badge&logo=Adobe%20Premiere%20Pro&logoColor=white) ![Aseprite](https://img.shields.io/badge/Aseprite-FFFFFF?style=for-the-badge&logo=Aseprite&logoColor=#7D929E) ![Blender](https://img.shields.io/badge/blender-%23F5792A.svg?style=for-the-badge&logo=blender&logoColor=white) ![Canva](https://img.shields.io/badge/Canva-%2300C4CC.svg?style=for-the-badge&logo=Canva&logoColor=white) ![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black) ![Keras](https://img.shields.io/badge/Keras-%23D00000.svg?style=for-the-badge&logo=Keras&logoColor=white) ![mlflow](https://img.shields.io/badge/mlflow-%23d9ead3.svg?style=for-the-badge&logo=numpy&logoColor=blue) ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white) ![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white) ![TensorFlow](https://img.shields.io/badge/TensorFlow-%23FF6F00.svg?style=for-the-badge&logo=TensorFlow&logoColor=white) ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white) ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white) ![Arduino](https://img.shields.io/badge/-Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white) ![Bitwarden](https://img.shields.io/badge/bitwarden-%23175DDC.svg?style=for-the-badge&logo=bitwarden&logoColor=white) ![Cisco](https://img.shields.io/badge/cisco-%23049fd9.svg?style=for-the-badge&logo=cisco&logoColor=black) ![FFmpeg](https://shields.io/badge/FFmpeg-%23171717.svg?logo=ffmpeg&style=for-the-badge&labelColor=171717&logoColor=5cb85c) ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white) ![Home Assistant](https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white) ![Jellyfin](https://img.shields.io/badge/jellyfin-%23000B25.svg?style=for-the-badge&logo=Jellyfin&logoColor=00A4DC) ![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white) ![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white) ![Plex](https://img.shields.io/badge/plex-%23E5A00D.svg?style=for-the-badge&logo=plex&logoColor=white) ![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=for-the-badge&logo=Raspberry-Pi) ![TOR](https://img.shields.io/badge/tor-%237E4798.svg?style=for-the-badge&logo=tor-project&logoColor=white) ![Tampermonkey](https://img.shields.io/badge/tampermonkey-%2300485B.svg?style=for-the-badge&logo=tampermonkey&logoColor=white) ![Zigbee](https://img.shields.io/badge/zigbee-%23EB0443.svg?style=for-the-badge&logo=zigbee&logoColor=white) ![AMD](https://img.shields.io/badge/AMD-%23000000.svg?style=for-the-badge&logo=amd&logoColor=white) ![EA](https://img.shields.io/badge/ea-%23000000.svg?style=for-the-badge&logo=ea&logoColor=white) ![Epic Games](https://img.shields.io/badge/epicgames-%23313131.svg?style=for-the-badge&logo=epicgames&logoColor=white) ![Battle.net](https://img.shields.io/badge/battle.net-%2300AEFF.svg?style=for-the-badge&logo=battle.net&logoColor=white) ![Godot Engine](https://img.shields.io/badge/GODOT-%23FFFFFF.svg?style=for-the-badge&logo=godot-engine) ![nVIDIA](https://img.shields.io/badge/nVIDIA-%2376B900.svg?style=for-the-badge&logo=nVIDIA&logoColor=white) ![PlayStation Network](https://img.shields.io/badge/PSN-%230070D1.svg?style=for-the-badge&logo=Playstation&logoColor=white) ![Riot Games](https://img.shields.io/badge/riotgames-D32936.svg?style=for-the-badge&logo=riotgames&logoColor=white) ![Square Enix](https://img.shields.io/badge/SquareEnix-%23ED1C24.svg?style=for-the-badge&logo=SquareEnix&logoColor=white) ![Unreal Engine](https://img.shields.io/badge/unrealengine-%23313131.svg?style=for-the-badge&logo=unrealengine&logoColor=white) ![Unity](https://img.shields.io/badge/unity-%23000000.svg?style=for-the-badge&logo=unity&logoColor=white) ![Ubisoft](https://img.shields.io/badge/Ubisoft-%23F5F5F5.svg?style=for-the-badge&logo=Ubisoft&logoColor=black) ![Steam](https://img.shields.io/badge/steam-%23000000.svg?style=for-the-badge&logo=steam&logoColor=white) ![Xbox](https://img.shields.io/badge/xbox-%23107C10.svg?style=for-the-badge&logo=xbox&logoColor=white) ![Sidequest](https://img.shields.io/badge/sidequest-%23101227.svg?style=for-the-badge&logo=sidequest&logoColor=white)
-# 📊 GitHub Stats:
-![](https://github-readme-stats.vercel.app/api?username=Atharv3142M&theme=dark&hide_border=false&include_all_commits=true&count_private=true)<br/>
-![](https://nirzak-streak-stats.vercel.app/?user=Atharv3142M&theme=dark&hide_border=false)<br/>
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=Atharv3142M&theme=dark&hide_border=false&include_all_commits=true&count_private=true&layout=compact)
+<p>
+<a href="https://github.com/Atharv3142M"><img src="https://img.shields.io/badge/GitHub-Atharv3142M-161B22?style=flat&logo=github&logoColor=white" alt="GitHub"></a>
+<a href="https://linkedin.com/in/atharv-pose"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=flat&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+<a href="mailto:atharvpose41@gmail.com"><img src="https://img.shields.io/badge/Email-Say%20hello-EA4335?style=flat&logo=gmail&logoColor=white" alt="Email"></a>
+</p>
 
-## 🏆 GitHub Trophies
-![](https://github-profile-trophy-tawny.vercel.app/?username=Atharv3142M&theme=radical&no-frame=false&no-bg=true&margin-w=4])
+**IT undergraduate · Developer · Cybersecurity enthusiast · Builder**
 
-### ✍️ Random Dev Quote
-![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=radical)
+*Curious about how systems work. More curious about how to make them work better.*
 
-### 🔝 Top Contributed Repo
-![](https://github-contributor-stats.vercel.app/api?username=Atharv3142M&limit=5&theme=dark&combine_all_yearly_contributions=true)
+</div>
 
 ---
 
-[![An image of @atharv3142m's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/atharv3142m)](https://holopin.io/@atharv3142m)
+## whoami
 
+I'm Atharv — an IT undergraduate who learns by building, experimenting, debugging, and occasionally taking things apart to understand what is happening underneath.
+
+My interests sit at the intersection of **software engineering, cybersecurity, automation, AI, and hardware**. I enjoy moving between layers: from a web interface to its backend, from a Python script to the system it automates, and from a microcontroller on a desk to the firmware running on it.
+
+I prefer practical engineering over collecting technologies. A project is most interesting when it solves a real problem, teaches me something substantial, or gives me a system I can keep improving.
+
+> **My philosophy:** Don't just use the tool. Understand the system behind it.
+
+---
+
+## Current missions
+
+| Area | What I'm exploring |
+|---|---|
+| **Cybersecurity & OSINT** | Security fundamentals, digital-footprint research, privacy, network concepts, and responsible security tooling |
+| **AI & spatial computing** | Computer vision, drone-video photogrammetry, 3D reconstruction, and AI-assisted interfaces |
+| **Hardware & embedded systems** | ESP32, microcontrollers, firmware, electronics, and low-cost open hardware |
+| **Software engineering** | Python, web applications, APIs, automation, databases, and developer tooling |
+| **Systems & self-hosting** | Linux/Windows environments, containers, networking, homelab-style experimentation, and infrastructure |
+
+Currently spending time on **posEye** and exploring the design of **Poserion ZERO**, an affordable, open-hardware multi-tool concept.
+
+---
+
+## Selected work
+
+A few projects that represent the kinds of problems I like working on.
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/posEye">posEye</a></h3>
+      <p><strong>Drone video → georeferenced 3D reconstruction.</strong></p>
+      <p>A Windows desktop application that processes drone footage and GPS telemetry into 3D models and GIS-oriented outputs. The pipeline brings together video processing, image analysis, photogrammetry, and interactive 3D visualization.</p>
+      <p><sub>Python · FFmpeg · OpenCV · OpenDroneMap · Three.js</sub></p>
+      <a href="https://atharv3142m.github.io/posEye/">Project site ↗</a>
+    </td>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/Poserion-ZERO">Poserion ZERO</a></h3>
+      <p><strong>An exploration in accessible hardware.</strong></p>
+      <p>A personal open-hardware direction inspired by portable cybersecurity and electronics multi-tools. The goal is to explore useful capabilities, practical component choices, and firmware in a cost-conscious design.</p>
+      <p><sub>Embedded systems · ESP32 · Electronics · Firmware</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/Capstone-Project-Management-Information-System">Capstone Project MIS</a></h3>
+      <p><strong>Making academic project workflows easier to manage.</strong></p>
+      <p>A role-based management information system for university capstone projects, with a modern web frontend, API backend, database migrations, and local development workflow.</p>
+      <p><sub>Next.js · TypeScript · Tailwind CSS · FastAPI · SQLAlchemy · PostgreSQL</sub></p>
+    </td>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/Mazgaon-Dock-MIS">Mazgaon Dock MIS</a></h3>
+      <p><strong>A management information system prototype.</strong></p>
+      <p>A web-based MIS prototype exploring how information and operational workflows can be organized for an industrial context.</p>
+      <p><sub>JavaScript · Web technologies</sub></p>
+      <a href="https://atharv3142m.github.io/Mazgaon-Dock-MIS/">Live demo ↗</a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/RTMSSU-HACKATHON">RTMSSU Hackathon</a></h3>
+      <p><strong>Building with constraints and a team.</strong></p>
+      <p>A hackathon project repository for a personal-finance application concept, bringing together mobile development, authentication, data handling, and machine-learning features.</p>
+      <p><sub>Flutter · Node.js · Python · MongoDB · Firebase</sub></p>
+    </td>
+    <td width="50%" valign="top">
+      <h3><a href="https://github.com/Atharv3142M/Free-Chess-Trainer">Free Chess Trainer</a></h3>
+      <p><strong>A small project at the intersection of logic and play.</strong></p>
+      <p>A chess-focused project reflecting another interest: games that reward pattern recognition, planning, and deliberate practice.</p>
+      <p><sub>Project repository ↗</sub></p>
+    </td>
+  </tr>
+</table>
+
+---
+
+## Toolbox
+
+I keep my toolkit practical and project-driven. These are technologies I've worked with or explored; proficiency varies by tool and project.
+
+**Languages & scripting**
+
+<p><img src="https://skillicons.dev/icons?i=python,js,ts,java,bash,powershell,html,css" alt="Python, JavaScript, TypeScript, Java, Bash, PowerShell, HTML and CSS" /></p>
+
+**Web, backend & data**
+
+<p><img src="https://skillicons.dev/icons?i=react,nextjs,tailwind,nodejs,flask,fastapi,django,mongodb,mysql,postgres,sqlite,firebase,supabase" alt="Web, backend and database technologies" /></p>
+
+**Computer vision, AI & developer tools**
+
+<p><img src="https://skillicons.dev/icons?i=opencv,pytorch,tensorflow,git,github,docker,linux,vscode,postman" alt="Computer vision, AI and developer tools" /></p>
+
+**Hardware & creative tools**
+
+<p><img src="https://skillicons.dev/icons?i=arduino,raspberrypi,blender,ae,ps,pr" alt="Hardware and creative tools" /></p>
+
+Also exploring: **FFmpeg · OpenDroneMap · Three.js · ESP32 · AWS · Vercel · Netlify**
+
+---
+
+## Beyond the terminal
+
+Technology is the main thread, but not the only one.
+
+- **Cybersecurity:** I enjoy learning how systems fail, how information leaks, and how to approach security responsibly.
+- **Gaming:** Strategy, open-world exploration, and games with good mechanics. Games are also a great way to appreciate systems design.
+- **Hardware tinkering:** Microcontrollers, DIY electronics, firmware, and making useful things from affordable components.
+- **Creative technology:** Video editing, visual effects, 3D tools, and the engineering behind good experiences.
+- **Curiosity:** New tools, obscure technical rabbit holes, and the occasional experiment that starts with “what if?”
+
+---
+
+## A little GitHub telemetry
+
+<div align="center">
+<img height="165" src="https://github-readme-stats.vercel.app/api?username=Atharv3142M&show_icons=true&hide_border=true&bg_color=0D1117&title_color=7DD3FC&text_color=C9D1D9&icon_color=38BDF8&rank_icon=github" alt="GitHub statistics" />
+<img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Atharv3142M&layout=compact&hide_border=true&bg_color=0D1117&title_color=7DD3FC&text_color=C9D1D9" alt="Most used languages" />
+<br/>
+<img src="https://streak-stats.demolab.com?user=Atharv3142M&hide_border=true&background=0D1117&ring=38BDF8&fire=38BDF8&currStreakLabel=7DD3FC&sideLabels=C9D1D9&dates=8B949E" alt="GitHub contribution streak" />
+</div>
+
+---
+
+## Connect
+
+Have an interesting project, a technical rabbit hole, or an idea worth prototyping?
+
+<div align="center">
+<a href="https://linkedin.com/in/atharv-pose">LinkedIn</a> ·
+<a href="mailto:atharvpose41@gmail.com">Email</a> ·
+<a href="https://github.com/Atharv3142M">GitHub</a>
+<br/><br/>
+<sub>Built with curiosity, late-night debugging, and too many open tabs.</sub>
+</div>
+
+<div align="center">
+<img src="https://capsule-render.vercel.app/api?type=rect&height=2&color=0:163B4A,50:38BDF8,100:163B4A&section=footer" width="100%" alt="" />
+</div>

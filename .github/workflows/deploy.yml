@@ -1,9 +1,9 @@
-name: Deploy PoserionOS to GitHub Pages
+name: Build and deploy PoserionOS
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - portfolio-site
 
 permissions:
   contents: read
@@ -11,30 +11,35 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: github-pages
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out portfolio-site
         uses: actions/checkout@v4
-      - name: Setup Node
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 26
+
       - name: Install dependencies
-        run: npm install
-      - name: Build site
+        run: npm install --no-audit --no-fund
+
+      - name: Typecheck and build
         run: npm run build
-      - name: Configure Pages
+
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
+
   deploy:
     environment:
       name: github-pages

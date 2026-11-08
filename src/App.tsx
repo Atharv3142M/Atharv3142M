@@ -1,578 +1,894 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import {
-  Activity, ArrowUpRight, Award, Check, ChevronDown, ChevronRight, Clock3,
-  Code2, Command, Cpu, ExternalLink, Folder, FolderOpen, Github, Globe2,
-  Grid2X2, HardDrive, Info, Laptop, Layers, Linkedin, Mail, Maximize2, Minus,
-  Moon, Palette, Power, Search, Settings, Shield, Sparkles, Sun, Terminal,
-  UserRound, Volume2, Wifi, X, Zap, Gamepad2, Clapperboard, type LucideIcon
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode
+} from 'react';
+import {
+  Activity,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Award,
+  Check,
+  ChevronRight,
+  Clock3,
+  Code2,
+  Command,
+  Cpu,
+  ExternalLink,
+  Folder,
+  FolderOpen,
+  HardDrive,
+  Home,
+  Info,
+  Layers,
+  Laptop,
+  LayoutGrid,
+  Mail,
+  Maximize2,
+  Minus,
+  Monitor,
+  Palette,
+  PanelLeft,
+  RotateCcw,
+  Search,
+  Settings,
+  ShieldCheck,
+  Square,
+  Terminal,
+  UserRound,
+  X,
+  Zap,
+  Gamepad2,
+  Clapperboard,
+  type LucideIcon
 } from 'lucide-react';
 import {
-  certificates, contact, education, projects, skillGroups,
-  type Project
+  certificates,
+  contact,
+  education,
+  milestones,
+  projects,
+  skillGroups,
+  wallpaperLibrary,
+  type Project,
+  type ProjectCategory
 } from './data';
+import { clampMove, clampResize, clampToViewport, type Geometry } from './windowGeometry';
+import { DEFAULT_PREFERENCES, PREFERENCE_KEY, parsePreferences, serializePreferences, type Preferences } from './preferences';
 
-type Theme = 'kali' | 'nord';
-type Wallpaper = 'railway' | 'nord-dusk' | 'kali-grid';
-type AppId = 'welcome' | 'projects' | 'about' | 'skills' | 'certificates' | 'terminal' | 'settings' | 'contact' | 'files' | 'lab';
-type WindowRecord = { id: AppId; x: number; y: number; w: number; h: number; z: number; minimized: boolean; maximized: boolean };
-type DragState = { id: AppId; mode: 'move' | 'resize'; startX: number; startY: number; x: number; y: number; w: number; h: number };
-
-const appMeta: Record<AppId, { title: string; icon: LucideIcon; short: string; subtitle: string }> = {
-  welcome: { title: 'Welcome', icon: Laptop, short: 'Home', subtitle: 'PoserionOS workspace' },
-  projects: { title: 'Projects', icon: FolderOpen, short: 'Projects', subtitle: 'Selected work and experiments' },
-  about: { title: 'About Atharv', icon: UserRound, short: 'About', subtitle: 'Profile and background' },
-  skills: { title: 'Toolkit', icon: Layers, short: 'Toolkit', subtitle: 'Tools, technologies and interests' },
-  certificates: { title: 'Certificates & achievements', icon: Award, short: 'Credentials', subtitle: 'Learning and milestones' },
-  terminal: { title: 'Terminal', icon: Terminal, short: 'Terminal', subtitle: 'A small portfolio shell' },
-  settings: { title: 'Appearance', icon: Settings, short: 'Settings', subtitle: 'Personalize the workspace' },
-  contact: { title: 'Contact', icon: Mail, short: 'Contact', subtitle: 'Open a conversation' },
-  files: { title: 'Places', icon: Folder, short: 'Places', subtitle: 'A quick index of this workspace' },
-  lab: { title: 'Lab notes', icon: Cpu, short: 'Lab', subtitle: 'Interests beyond the code editor' }
+type AppId = 'home' | 'projects' | 'about' | 'toolkit' | 'credentials' | 'terminal' | 'places' | 'settings' | 'contact' | 'lab' | 'device';
+type WindowState = Geometry & {
+  id: AppId;
+  z: number;
+  minimized: boolean;
+  maximized: boolean;
+};
+type Interaction = {
+  id: AppId;
+  pointerId: number;
+  mode: 'move' | 'resize';
+  startX: number;
+  startY: number;
+  initial: Geometry;
+  current: Geometry;
+  element: HTMLElement;
 };
 
-const appOrder: AppId[] = ['welcome', 'projects', 'about', 'skills', 'certificates', 'terminal', 'lab', 'files', 'settings', 'contact'];
-const defaultSizes: Record<AppId, { w: number; h: number; x: number; y: number }> = {
-  welcome: { w: 610, h: 385, x: 74, y: 78 },
-  projects: { w: 940, h: 650, x: 90, y: 70 },
-  about: { w: 760, h: 560, x: 130, y: 85 },
-  skills: { w: 820, h: 590, x: 140, y: 86 },
-  certificates: { w: 740, h: 560, x: 150, y: 90 },
-  terminal: { w: 680, h: 470, x: 95, y: 102 },
-  settings: { w: 720, h: 540, x: 160, y: 80 },
-  contact: { w: 580, h: 450, x: 170, y: 110 },
-  files: { w: 700, h: 500, x: 105, y: 100 },
-  lab: { w: 720, h: 540, x: 135, y: 90 }
-};
+type AppMeta = { title: string; short: string; subtitle: string; icon: LucideIcon };
 
-function readPreference<T extends string>(key: string, fallback: T, allowed: T[]): T {
-  try {
-    const saved = window.localStorage.getItem(key) as T | null;
-    return saved && allowed.includes(saved) ? saved : fallback;
-  } catch {
-    return fallback;
-  }
+function GitHubMark({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+      <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.08c-3.1.68-3.76-1.31-3.76-1.31-.51-1.3-1.24-1.65-1.24-1.65-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 1.7 2.62 1.21 3.26.92.1-.72.39-1.21.71-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.53.23 2.67.11 2.95.72.78 1.15 1.77 1.15 2.99 0 4.29-2.62 5.23-5.11 5.51.4.35.76 1.03.76 2.08v3.08c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z" />
+    </svg>
+  );
 }
 
-function ClockDisplay() {
+const appMeta: Record<AppId, AppMeta> = {
+  home: { title: 'Welcome', short: 'Home', subtitle: 'Workspace overview', icon: Home },
+  projects: { title: 'Projects', short: 'Projects', subtitle: 'Selected work and technical case studies', icon: FolderOpen },
+  about: { title: 'About Atharv', short: 'About', subtitle: 'Profile and education', icon: UserRound },
+  toolkit: { title: 'Toolkit', short: 'Toolkit', subtitle: 'Technologies and tools used', icon: Layers },
+  credentials: { title: 'Credentials', short: 'Credentials', subtitle: 'Certificates and milestones', icon: Award },
+  terminal: { title: 'Terminal', short: 'Terminal', subtitle: 'Portfolio command interface', icon: Terminal },
+  places: { title: 'Places', short: 'Places', subtitle: 'Browse the workspace index', icon: Folder },
+  settings: { title: 'Settings', short: 'Settings', subtitle: 'Personalize this browser workspace', icon: Settings },
+  contact: { title: 'Contact', short: 'Contact', subtitle: 'Contact and profile links', icon: Mail },
+  lab: { title: 'Lab Notes', short: 'Lab', subtitle: 'Hardware, systems, games and media', icon: Cpu },
+  device: { title: 'About this device', short: 'Device', subtitle: 'Workspace information and privacy', icon: Monitor }
+};
+
+const appOrder: AppId[] = ['home', 'projects', 'places', 'about', 'toolkit', 'credentials', 'terminal', 'lab', 'settings', 'contact', 'device'];
+const pinnedApps: AppId[] = ['home', 'projects', 'places', 'terminal', 'toolkit', 'settings'];
+const defaultGeometry: Record<AppId, Geometry> = {
+  home: { x: 160, y: 82, width: 690, height: 510 },
+  projects: { x: 145, y: 66, width: 980, height: 650 },
+  about: { x: 168, y: 84, width: 730, height: 570 },
+  toolkit: { x: 160, y: 82, width: 800, height: 590 },
+  credentials: { x: 160, y: 78, width: 780, height: 590 },
+  terminal: { x: 160, y: 102, width: 700, height: 470 },
+  places: { x: 160, y: 72, width: 820, height: 570 },
+  settings: { x: 160, y: 76, width: 760, height: 590 },
+  contact: { x: 176, y: 94, width: 620, height: 470 },
+  lab: { x: 160, y: 88, width: 780, height: 580 },
+  device: { x: 176, y: 105, width: 590, height: 440 }
+};
+
+const compactQuery = '(max-width: 760px)';
+
+function readPreferences(): Preferences {
+  try { return parsePreferences(window.localStorage.getItem(PREFERENCE_KEY)); }
+  catch { return { ...DEFAULT_PREFERENCES }; }
+}
+
+function useCompactLayout() {
+  const [compact, setCompact] = useState(() => typeof window !== 'undefined' && window.matchMedia(compactQuery).matches);
+  useEffect(() => {
+    const query = window.matchMedia(compactQuery);
+    const update = () => setCompact(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  return compact;
+}
+
+function LocalClock() {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
     return () => window.clearInterval(timer);
   }, []);
-  return <div className="panel-clock" aria-label="Local date and time">
-    <span>{now.toLocaleDateString(undefined, { weekday: 'short', day: '2-digit', month: 'short' })}</span>
+  return <>
+    <span>{now.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}</span>
     <strong>{now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</strong>
+  </>;
+}
+
+function IconButton({ label, onClick, children, className = '' }: { label: string; onClick: () => void; children: ReactNode; className?: string }) {
+  return <button className={`icon-button ${className}`} type="button" aria-label={label} title={label} onClick={onClick}>{children}</button>;
+}
+
+function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: ReactNode }) {
+  return <div className="section-heading">
+    <div><span className="eyebrow">{eyebrow}</span><h2>{title}</h2></div>
+    {children}
   </div>;
 }
 
 function App() {
-  const [theme, setTheme] = useState<Theme>(() => readPreference('poserion-theme', 'kali', ['kali', 'nord']));
-  const [wallpaper, setWallpaper] = useState<Wallpaper>(() => readPreference('poserion-wallpaper', 'railway', ['railway', 'nord-dusk', 'kali-grid']));
-  const [windows, setWindows] = useState<WindowRecord[]>([
-    { id: 'welcome', ...defaultSizes.welcome, z: 10, minimized: false, maximized: false }
+  const [preferences, setPreferences] = useState<Preferences>(readPreferences);
+  const [windows, setWindows] = useState<WindowState[]>([
+    { id: 'home', ...defaultGeometry.home, z: 10, minimized: false, maximized: false }
   ]);
-  const [activeId, setActiveId] = useState<AppId>('welcome');
+  const [activeId, setActiveId] = useState<AppId>('home');
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [launcherQuery, setLauncherQuery] = useState('');
   const [notification, setNotification] = useState('');
-  const [currentTime, setCurrentTime] = useState(() => new Date());
-  const dragRef = useRef<DragState | null>(null);
-  const zRef = useRef(20);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const compact = useCompactLayout();
+  const windowElements = useRef(new Map<AppId, HTMLElement>());
+  const interaction = useRef<Interaction | null>(null);
+  const animationFrame = useRef<number | null>(null);
+  const zCounter = useRef(20);
+  const toastTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => window.clearInterval(timer);
+    document.documentElement.dataset.theme = preferences.theme;
+    document.documentElement.dataset.accent = preferences.accent;
+    document.documentElement.dataset.reduceMotion = preferences.reduceMotion ? 'true' : 'false';
+    try { window.localStorage.setItem(PREFERENCE_KEY, serializePreferences(preferences)); } catch { /* storage may be disabled */ }
+  }, [preferences]);
+
+  useEffect(() => () => {
+    if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
   }, []);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem('poserion-theme', theme);
-  }, [theme]);
-
-  useEffect(() => {
-    window.localStorage.setItem('poserion-wallpaper', wallpaper);
-  }, [wallpaper]);
 
   const notify = useCallback((message: string) => {
     setNotification(message);
-    window.setTimeout(() => setNotification(''), 2600);
+    if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setNotification(''), 2300);
   }, []);
+
+  const updatePreference = useCallback(<K extends keyof Preferences>(key: K, value: Preferences[K]) => {
+    setPreferences(current => ({ ...current, [key]: value }));
+  }, []);
+
+  const resetPreferences = useCallback(() => {
+    try { window.localStorage.removeItem(PREFERENCE_KEY); } catch { /* storage may be disabled */ }
+    setPreferences(DEFAULT_PREFERENCES);
+    setWindows(current => current.map(item => ({ ...item, ...clampToViewport(defaultGeometry[item.id], { width: window.innerWidth, height: window.innerHeight }), maximized: false })));
+    notify('Workspace preferences restored to defaults.');
+  }, [notify]);
+
+  const focusWindow = useCallback((id: AppId) => {
+    setActiveId(id);
+    const currentWindow = windows.find(item => item.id === id);
+    const highest = Math.max(0, ...windows.filter(item => !item.minimized).map(item => item.z));
+    if (!currentWindow || currentWindow.z >= highest) return;
+    const nextZ = Math.max(zCounter.current, highest) + 1;
+    zCounter.current = nextZ;
+    setWindows(current => current.map(item => item.id === id ? { ...item, z: nextZ } : item));
+  }, [windows]);
 
   const openApp = useCallback((id: AppId) => {
-    setWindows(current => {
-      const existing = current.find(windowItem => windowItem.id === id);
-      if (existing) {
-        return current.map(windowItem => windowItem.id === id
-          ? { ...windowItem, minimized: false, z: ++zRef.current }
-          : windowItem);
-      }
-      const size = defaultSizes[id];
-      return [...current, { id, ...size, z: ++zRef.current, minimized: false, maximized: false }];
-    });
+    const existing = windows.find(item => item.id === id);
+    const nextZ = Math.max(zCounter.current, ...windows.map(item => item.z), 10) + 1;
+    zCounter.current = nextZ;
+    if (existing) {
+      setWindows(current => current.map(item => item.id === id ? { ...item, minimized: false, z: nextZ } : item));
+    } else {
+      const base = defaultGeometry[id];
+      const offset = Math.min(windows.length * 17, 85);
+      const geometry = compact
+        ? { x: 8, y: 58, width: window.innerWidth - 16, height: window.innerHeight - 134 }
+        : clampToViewport({ ...base, x: base.x + offset, y: base.y + offset }, { width: window.innerWidth, height: window.innerHeight });
+      setWindows(current => [...current, { id, ...geometry, z: nextZ, minimized: false, maximized: false }]);
+    }
     setActiveId(id);
     setLauncherOpen(false);
-  }, []);
+    if (id !== 'projects') setSelectedProjectId(null);
+  }, [compact, windows]);
 
   const closeApp = useCallback((id: AppId) => {
-    setWindows(current => current.filter(windowItem => windowItem.id !== id));
-    setActiveId(current => current === id ? 'welcome' : current);
-  }, []);
+    const remaining = windows.filter(item => item.id !== id);
+    setWindows(remaining);
+    if (activeId === id) {
+      const next = remaining.filter(item => !item.minimized).sort((a, b) => b.z - a.z)[0];
+      setActiveId(next?.id ?? 'home');
+    }
+  }, [activeId, windows]);
 
   const minimizeApp = useCallback((id: AppId) => {
-    setWindows(current => current.map(windowItem => windowItem.id === id ? { ...windowItem, minimized: true } : windowItem));
-    setActiveId(current => current === id ? 'welcome' : current);
-  }, []);
+    const remaining = windows.map(item => item.id === id ? { ...item, minimized: true } : item);
+    setWindows(remaining);
+    if (activeId === id) {
+      const next = remaining.filter(item => !item.minimized).sort((a, b) => b.z - a.z)[0];
+      setActiveId(next?.id ?? 'home');
+    }
+  }, [activeId, windows]);
 
-  const maximizeApp = useCallback((id: AppId) => {
-    setWindows(current => current.map(windowItem => windowItem.id === id ? { ...windowItem, maximized: !windowItem.maximized, z: ++zRef.current } : windowItem));
+  const toggleMaximize = useCallback((id: AppId) => {
+    const nextZ = ++zCounter.current;
+    setWindows(current => current.map(item => item.id === id ? { ...item, maximized: !item.maximized, z: nextZ } : item));
     setActiveId(id);
   }, []);
 
-  const focusApp = useCallback((id: AppId) => {
-    setWindows(current => current.map(windowItem => windowItem.id === id ? { ...windowItem, z: ++zRef.current } : windowItem));
+  const restoreWindow = useCallback((id: AppId) => {
+    const nextZ = ++zCounter.current;
+    setWindows(current => current.map(item => item.id === id ? { ...item, minimized: false, z: nextZ } : item));
     setActiveId(id);
   }, []);
 
-  const beginDrag = (event: ReactPointerEvent, id: AppId, mode: 'move' | 'resize') => {
-    if (event.button !== 0 || (event.target as HTMLElement).closest('button')) return;
-    const item = windows.find(windowItem => windowItem.id === id);
-    if (!item || item.maximized) return;
+  const beginInteraction = useCallback((event: ReactPointerEvent<HTMLElement>, id: AppId, mode: 'move' | 'resize') => {
+    if (compact || event.button !== 0) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('button, a, input, textarea, select, [data-no-drag="true"]')) return;
+    const windowState = windows.find(item => item.id === id);
+    const element = windowElements.current.get(id);
+    if (!windowState || !element || windowState.maximized) return;
     event.preventDefault();
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-    dragRef.current = { id, mode, startX: event.clientX, startY: event.clientY, x: item.x, y: item.y, w: item.w, h: item.h };
-    focusApp(id);
-  };
+    const initial: Geometry = { x: windowState.x, y: windowState.y, width: windowState.width, height: windowState.height };
+    interaction.current = {
+      id,
+      pointerId: event.pointerId,
+      mode,
+      startX: event.clientX,
+      startY: event.clientY,
+      initial,
+      current: initial,
+      element
+    };
+    element.classList.add('is-interacting');
+    document.documentElement.classList.add('poserion-interacting');
+  }, [compact, windows]);
 
-  const moveDrag = (event: ReactPointerEvent) => {
-    const drag = dragRef.current;
-    if (!drag) return;
-    const dx = event.clientX - drag.startX;
-    const dy = event.clientY - drag.startY;
-    setWindows(current => current.map(item => {
-      if (item.id !== drag.id) return item;
-      if (drag.mode === 'move') {
-        const x = Math.max(-item.w + 150, Math.min(window.innerWidth - 110, drag.x + dx));
-        const y = Math.max(44, Math.min(window.innerHeight - 120, drag.y + dy));
-        return { ...item, x, y };
+  useEffect(() => {
+    const applyGeometry = (session: Interaction, clientX: number, clientY: number) => {
+      const delta = { x: clientX - session.startX, y: clientY - session.startY };
+      const next = session.mode === 'move'
+        ? clampMove(session.initial, delta, { width: window.innerWidth, height: window.innerHeight })
+        : clampResize(session.initial, delta, { width: window.innerWidth, height: window.innerHeight });
+      session.current = next;
+      if (session.mode === 'move') {
+        session.element.style.transform = `translate3d(${next.x - session.initial.x}px, ${next.y - session.initial.y}px, 0)`;
+      } else {
+        session.element.style.width = `${next.width}px`;
+        session.element.style.height = `${next.height}px`;
       }
-      return { ...item, w: Math.max(360, Math.min(window.innerWidth - item.x - 18, drag.w + dx)), h: Math.max(280, Math.min(window.innerHeight - item.y - 82, drag.h + dy)) };
-    }));
-  };
+    };
 
-  const endDrag = () => { dragRef.current = null; };
+    const onPointerMove = (event: PointerEvent) => {
+      const session = interaction.current;
+      if (!session || event.pointerId !== session.pointerId) return;
+      if (animationFrame.current !== null) cancelAnimationFrame(animationFrame.current);
+      animationFrame.current = requestAnimationFrame(() => {
+        applyGeometry(session, event.clientX, event.clientY);
+        animationFrame.current = null;
+      });
+    };
+
+    const finishInteraction = (event?: PointerEvent) => {
+      const session = interaction.current;
+      if (!session || (event && event.pointerId !== session.pointerId)) return;
+      if (animationFrame.current !== null) {
+        cancelAnimationFrame(animationFrame.current);
+        animationFrame.current = null;
+      }
+      if (event) applyGeometry(session, event.clientX, event.clientY);
+      session.element.classList.remove('is-interacting');
+      session.element.style.removeProperty('transform');
+      session.element.style.removeProperty('width');
+      session.element.style.removeProperty('height');
+      document.documentElement.classList.remove('poserion-interacting');
+      setWindows(current => current.map(item => item.id === session.id ? { ...item, ...session.current } : item));
+      interaction.current = null;
+    };
+
+    document.addEventListener('pointermove', onPointerMove, { passive: true });
+    document.addEventListener('pointerup', finishInteraction);
+    document.addEventListener('pointercancel', finishInteraction);
+    const onBlur = () => finishInteraction();
+    window.addEventListener('blur', onBlur);
+    return () => {
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', finishInteraction);
+      document.removeEventListener('pointercancel', finishInteraction);
+      window.removeEventListener('blur', onBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      const viewport = { width: window.innerWidth, height: window.innerHeight };
+      setWindows(current => current.map(item => item.maximized ? item : { ...item, ...clampToViewport(item, viewport) }));
+    };
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
-      const typing = target && ['INPUT', 'TEXTAREA'].includes(target.tagName);
+      const typing = target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault(); setLauncherOpen(value => !value); setLauncherQuery('');
+        event.preventDefault();
+        setLauncherOpen(value => !value);
+        setLauncherQuery('');
+      }
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === 't') {
+        event.preventDefault();
+        openApp('terminal');
       }
       if (event.key === 'Escape') setLauncherOpen(false);
+      if (!typing && event.ctrlKey && event.key.toLowerCase() === 'w' && activeId) {
+        event.preventDefault();
+        closeApp(activeId);
+      }
       if (!typing && event.altKey && /^[1-9]$/.test(event.key)) {
-        const index = Number(event.key) - 1;
-        const id = appOrder[index];
+        const id = appOrder[Number(event.key) - 1];
         if (id) openApp(id);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [openApp]);
+  }, [activeId, closeApp, openApp]);
 
   const launcherApps = useMemo(() => appOrder.filter(id => {
-    const searchable = `${appMeta[id].title} ${appMeta[id].subtitle}`.toLowerCase();
-    return searchable.includes(launcherQuery.toLowerCase());
+    const search = `${appMeta[id].title} ${appMeta[id].subtitle} ${id}`.toLowerCase();
+    return search.includes(launcherQuery.toLowerCase().trim());
   }), [launcherQuery]);
 
-  const renderWindowContent = (id: AppId) => {
+  const getWindowRef = (id: AppId) => (node: HTMLElement | null) => {
+    if (node) windowElements.current.set(id, node);
+    else windowElements.current.delete(id);
+  };
+
+  const renderApplication = (id: AppId) => {
     switch (id) {
-      case 'welcome': return <WelcomeApp openApp={openApp} />;
-      case 'projects': return <ProjectsApp />;
-      case 'about': return <AboutApp />;
-      case 'skills': return <SkillsApp />;
-      case 'certificates': return <CertificatesApp />;
-      case 'terminal': return <TerminalApp openApp={openApp} setTheme={setTheme} notify={notify} />;
-      case 'settings': return <SettingsApp theme={theme} setTheme={setTheme} wallpaper={wallpaper} setWallpaper={setWallpaper} />;
+      case 'home': return <HomeApp openApp={openApp} />;
+      case 'projects': return <ProjectsApp selectedProjectId={selectedProjectId} setSelectedProjectId={setSelectedProjectId} />;
+      case 'about': return <AboutApp openApp={openApp} />;
+      case 'toolkit': return <ToolkitApp />;
+      case 'credentials': return <CredentialsApp />;
+      case 'terminal': return <TerminalApp openApp={openApp} preferences={preferences} setPreferences={setPreferences} />;
+      case 'places': return <PlacesApp openApp={openApp} />;
+      case 'settings': return <SettingsApp preferences={preferences} updatePreference={updatePreference} resetPreferences={resetPreferences} />;
       case 'contact': return <ContactApp />;
-      case 'files': return <FilesApp openApp={openApp} />;
       case 'lab': return <LabApp />;
+      case 'device': return <DeviceApp />;
     }
   };
 
-  return <main className={`desktop theme-${theme} wallpaper-${wallpaper}`}>
-    <div className="wallpaper-image" aria-hidden="true" />
-    <div className="wallpaper-shade" aria-hidden="true" />
+  const wallpaper = wallpaperLibrary.find(item => item.id === preferences.wallpaper) ?? wallpaperLibrary[0];
+
+  return <main className={`desktop theme-${preferences.theme}`}>
+    <div className="wallpaper-layer" style={{ backgroundImage: `url("${wallpaper.file}")` }} aria-hidden="true" />
+    <div className="wallpaper-vignette" aria-hidden="true" />
+
     <header className="top-panel">
-      <button className="brand-button" onClick={() => setLauncherOpen(value => !value)} aria-label="Open application launcher">
-        <img src="/brand/poserionos-mark.svg" alt="" />
+      <button className="brand-button" type="button" onClick={() => openApp('home')} aria-label="Open PoserionOS home">
+        <img src="/brand/poserion-mark.png" alt="" />
         <span>PoserionOS</span>
-        <span className="version-tag">4.0</span>
       </button>
-      <div className="panel-divider" />
-      <nav className="panel-nav" aria-label="Desktop actions">
-        <button onClick={() => setLauncherOpen(value => !value)}><Grid2X2 size={15} /> <span>Applications</span></button>
-        <button onClick={() => openApp('files')}><Folder size={15} /> <span>Places</span></button>
-        <button onClick={() => openApp('terminal')}><Terminal size={15} /> <span>Terminal</span></button>
+      <span className="panel-divider" />
+      <nav className="top-nav" aria-label="Workspace">
+        <button type="button" className={launcherOpen ? 'nav-active' : ''} onClick={() => { setLauncherOpen(value => !value); setLauncherQuery(''); }}><LayoutGrid size={15} /> Applications</button>
+        <button type="button" onClick={() => openApp('places')}><Folder size={15} /> Places</button>
+        <button type="button" onClick={() => openApp('terminal')}><Terminal size={15} /> Terminal</button>
       </nav>
-      <div className="panel-spacer" />
-      <div className="panel-status">
-        <button className="icon-button panel-theme-button" onClick={() => setTheme(value => value === 'kali' ? 'nord' : 'kali')} aria-label="Switch theme" title={`Switch to ${theme === 'kali' ? 'Nord' : 'Kali Blue'}`}>
-          {theme === 'kali' ? <Moon size={16} /> : <Sun size={16} />}
-        </button>
-        <button className="icon-button" onClick={() => openApp('settings')} aria-label="Appearance settings" title="Appearance settings"><Palette size={16} /></button>
-        <div className="panel-system-icons" aria-label="Decorative desktop status icons"><Wifi size={15} /><Volume2 size={15} /></div>
-        <ClockDisplay />
-        <button className="power-button" onClick={() => openApp('about')} aria-label="About PoserionOS" title="About PoserionOS"><Power size={15} /></button>
+      <div className="top-spacer" />
+      <div className="top-status">
+        <div className="top-clock"><LocalClock /></div>
+        <IconButton label="Settings" onClick={() => openApp('settings')}><Settings size={17} /></IconButton>
       </div>
     </header>
 
-    <aside className="desktop-shortcuts" aria-label="Desktop shortcuts">
-      {(['projects', 'about', 'terminal', 'certificates'] as AppId[]).map(id => {
-        const Icon = appMeta[id].icon;
-        return <button className="desktop-shortcut" key={id} onClick={() => focusOrOpen(id, openApp, focusApp, windows)} title={`Open ${appMeta[id].title}`}>
-          <span className="shortcut-icon"><Icon size={22} /></span>
-          <span>{appMeta[id].short}</span>
-        </button>;
-      })}
+    <aside className="left-rail" aria-label="Application shortcuts">
+      <div className="rail-primary">
+        {(['home', 'projects', 'places', 'toolkit', 'credentials', 'lab'] as AppId[]).map(id => {
+          const Icon = appMeta[id].icon;
+          const visible = windows.some(item => item.id === id && !item.minimized);
+          return <button key={id} type="button" className={`rail-button ${activeId === id && visible ? 'rail-selected' : ''}`} onClick={() => openApp(id)} title={appMeta[id].title} aria-label={`Open ${appMeta[id].title}`}>
+            <Icon size={19} strokeWidth={1.8} /><span>{appMeta[id].short}</span>
+          </button>;
+        })}
+      </div>
+      <div className="rail-bottom">
+        <button type="button" className="rail-button" onClick={() => openApp('contact')} title="Contact" aria-label="Open contact"><Mail size={18} /><span>Contact</span></button>
+        <button type="button" className="rail-button" onClick={() => openApp('settings')} title="Settings" aria-label="Open settings"><Settings size={18} /><span>Settings</span></button>
+      </div>
     </aside>
 
-    <section className="desktop-widgets" aria-label="Workspace information">
-      <div className="widget widget-clock">
-        <span className="widget-eyebrow"><Clock3 size={13} /> LOCAL TIME</span>
-        <strong>{currentTime.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</strong>
-        <span>{currentTime.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+    {preferences.showWidgets && <section className="desktop-widgets" aria-label="Desktop widgets">
+      <div className="desktop-widget widget-clock">
+        <span className="widget-label"><Clock3 size={13} /> LOCAL TIME</span>
+        <LocalClock />
       </div>
-      <div className="widget widget-focus">
-        <span className="widget-eyebrow"><Activity size={13} /> CURRENT FOCUS</span>
-        <strong>Research. Build. Iterate.</strong>
-        <div className="focus-tags"><span>OSINT</span><span>Computer vision</span><span>Hardware</span></div>
+      <div className="desktop-widget widget-focus">
+        <span className="widget-label"><Activity size={13} /> CURRENT FOCUS</span>
+        <strong>Software, security and systems</strong>
+        <div className="focus-tags"><span>OSINT</span><span>Computer vision</span><span>Embedded</span></div>
       </div>
-    </section>
+    </section>}
 
-    <AnimatePresence>
-      {windows.filter(item => !item.minimized).map(item => {
-        const MetaIcon = appMeta[item.id].icon;
-        return <motion.section
-          key={item.id}
-          className={`app-window ${activeId === item.id ? 'is-active' : ''} ${item.maximized ? 'is-maximized' : ''}`}
-          style={{ left: item.x, top: item.y, width: item.w, height: item.h, zIndex: item.z }}
-          initial={{ opacity: 0, scale: 0.97, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.98, y: 6 }}
-          transition={{ duration: 0.16, ease: 'easeOut' }}
-          onPointerDown={() => focusApp(item.id)}
-        >
-          <div className="window-titlebar" onPointerDown={event => beginDrag(event, item.id, 'move')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
-            <div className="window-app-identity"><MetaIcon size={15} /><span>{appMeta[item.id].title}</span></div>
-            <span className="window-subtitle">{appMeta[item.id].subtitle}</span>
-            <div className="window-controls">
-              <button onClick={() => minimizeApp(item.id)} aria-label="Minimize"><Minus size={14} /></button>
-              <button onClick={() => maximizeApp(item.id)} aria-label={item.maximized ? 'Restore' : 'Maximize'}><Maximize2 size={12} /></button>
-              <button className="close-window" onClick={() => closeApp(item.id)} aria-label="Close"><X size={14} /></button>
-            </div>
-          </div>
-          <div className="window-content">{renderWindowContent(item.id)}</div>
-          {!item.maximized && <div className="resize-grip" onPointerDown={event => beginDrag(event, item.id, 'resize')} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag} aria-label="Resize window" />}
-        </motion.section>;
+    {preferences.showShortcuts && <div className="desktop-shortcuts" aria-label="Desktop files">
+      {(['projects', 'about', 'terminal'] as AppId[]).map(id => {
+        const Icon = appMeta[id].icon;
+        return <button key={id} type="button" className="desktop-shortcut" onClick={() => openApp(id)} title={`Open ${appMeta[id].title}`}>
+          <span><Icon size={22} /></span><small>{appMeta[id].short}</small>
+        </button>;
       })}
-    </AnimatePresence>
+    </div>}
 
-    <AnimatePresence>
-      {launcherOpen && <>
-        <motion.button className="launcher-backdrop" aria-label="Close launcher" onClick={() => setLauncherOpen(false)} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
-        <motion.section className="launcher-menu" initial={{ opacity: 0, y: 10, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: 0.98 }}>
-          <div className="launcher-heading"><div><span className="launcher-label">POSERIONOS</span><strong>Applications</strong></div><span className="launcher-shortcut"><Command size={12} /> K</span></div>
-          <label className="launcher-search"><Search size={16} /><input value={launcherQuery} onChange={event => setLauncherQuery(event.target.value)} placeholder="Search applications..." autoFocus /></label>
-          <div className="launcher-grid">
-            {launcherApps.length ? launcherApps.map(id => {
-              const Icon = appMeta[id].icon;
-              return <button key={id} onClick={() => openApp(id)} className="launcher-app"><span><Icon size={20} /></span><strong>{appMeta[id].title}</strong><small>{appMeta[id].subtitle}</small></button>;
-            }) : <p className="empty-state">No application found.</p>}
+    {windows.filter(item => !item.minimized).map(item => {
+      const Icon = appMeta[item.id].icon;
+      const style: CSSProperties = { left: item.x, top: item.y, width: item.width, height: item.height, zIndex: item.z };
+      return <section
+        key={item.id}
+        ref={getWindowRef(item.id)}
+        className={`app-window ${activeId === item.id ? 'is-active' : ''} ${item.maximized ? 'is-maximized' : ''}`}
+        style={style}
+        aria-label={appMeta[item.id].title}
+        onPointerDown={() => focusWindow(item.id)}
+      >
+        <header
+          className="window-titlebar"
+          onPointerDown={event => beginInteraction(event, item.id, 'move')}
+          onDoubleClick={event => {
+            const target = event.target as HTMLElement;
+            if (!target.closest('button')) toggleMaximize(item.id);
+          }}
+        >
+          <div className="window-identity"><span className="window-app-icon"><Icon size={15} /></span><strong>{appMeta[item.id].title}</strong><small>{appMeta[item.id].subtitle}</small></div>
+          <div className="window-controls" data-no-drag="true">
+            <IconButton label="Minimize" onClick={() => minimizeApp(item.id)}><Minus size={14} /></IconButton>
+            <IconButton label={item.maximized ? 'Restore' : 'Maximize'} onClick={() => toggleMaximize(item.id)}>{item.maximized ? <Square size={12} /> : <Maximize2 size={13} />}</IconButton>
+            <IconButton label="Close" className="close-control" onClick={() => closeApp(item.id)}><X size={15} /></IconButton>
           </div>
-          <div className="launcher-footer"><span>Atharv Pose</span><button onClick={() => openApp('settings')}><Settings size={14} /> Settings</button></div>
-        </motion.section>
-      </>}
-    </AnimatePresence>
+        </header>
+        <div className="window-content">{renderApplication(item.id)}</div>
+        {!item.maximized && !compact && <div className="resize-grip" onPointerDown={event => beginInteraction(event, item.id, 'resize')} aria-hidden="true" />}
+      </section>;
+    })}
+
+    {launcherOpen && <>
+      <button className="launcher-scrim" type="button" aria-label="Close applications menu" onClick={() => setLauncherOpen(false)} />
+      <section className="launcher-menu" aria-label="Applications">
+        <div className="launcher-heading"><div><span className="eyebrow">WORKSPACE</span><h2>Applications</h2></div><kbd><Command size={12} /> K</kbd></div>
+        <label className="launcher-search"><Search size={16} /><input autoFocus value={launcherQuery} onChange={event => setLauncherQuery(event.target.value)} placeholder="Search applications" /></label>
+        <div className="launcher-grid">
+          {launcherApps.map(id => {
+            const Icon = appMeta[id].icon;
+            return <button key={id} type="button" className="launcher-app" onClick={() => openApp(id)}><span><Icon size={19} /></span><strong>{appMeta[id].title}</strong><small>{appMeta[id].subtitle}</small></button>;
+          })}
+          {launcherApps.length === 0 && <div className="empty-state">No matching application.</div>}
+        </div>
+        <div className="launcher-footer"><span>Atharv Pose</span><span>Ctrl + K to toggle</span></div>
+      </section>
+    </>}
 
     <footer className="dock-wrap" aria-label="Application dock">
       <div className="dock">
-        {(['welcome', 'projects', 'terminal', 'about', 'skills', 'certificates', 'settings', 'contact'] as AppId[]).map((id, index) => {
+        {pinnedApps.map(id => {
           const Icon = appMeta[id].icon;
-          const isOpen = windows.some(item => item.id === id);
-          const isVisible = windows.some(item => item.id === id && !item.minimized);
-          return <div className="dock-slot" key={id}>
-            {index === 2 || index === 6 ? <span className="dock-divider" /> : null}
-            <button className={`dock-icon ${activeId === id && isVisible ? 'dock-selected' : ''}`} onClick={() => {
-              const item = windows.find(win => win.id === id);
-              if (item && !item.minimized && activeId === id) minimizeApp(id);
-              else openApp(id);
-            }} aria-label={`Open ${appMeta[id].title}`} title={appMeta[id].title}>
-              <Icon size={21} strokeWidth={1.7} />
-              {isOpen && <span className={`dock-dot ${isVisible ? 'visible' : ''}`} />}
-            </button>
-          </div>;
+          const opened = windows.some(item => item.id === id);
+          const visible = windows.some(item => item.id === id && !item.minimized);
+          return <button key={id} type="button" className={`dock-item ${activeId === id && visible ? 'dock-active' : ''}`} title={appMeta[id].title} aria-label={appMeta[id].title} onClick={() => {
+            const existing = windows.find(item => item.id === id);
+            if (existing && !existing.minimized && activeId === id) minimizeApp(id);
+            else if (existing) restoreWindow(id);
+            else openApp(id);
+          }}>
+            <Icon size={20} strokeWidth={1.8} />{opened && <span className={`dock-indicator ${visible ? 'indicator-active' : ''}`} />}
+          </button>;
         })}
-        <span className="dock-divider" />
-        <button className="dock-icon dock-launcher" onClick={() => setLauncherOpen(value => !value)} aria-label="Open applications"><Grid2X2 size={20} /></button>
+        <span className="dock-separator" />
+        <button type="button" className="dock-item dock-launcher" title="Applications" aria-label="Applications" onClick={() => { setLauncherOpen(value => !value); setLauncherQuery(''); }}><LayoutGrid size={19} /></button>
       </div>
-      <span className="dock-caption">POSERIONOS WORKSPACE</span>
     </footer>
 
-    <AnimatePresence>
-      {notification && <motion.div className="toast" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}><Check size={15} />{notification}</motion.div>}
-    </AnimatePresence>
-
-    <div className="mobile-hint"><span>PoserionOS</span><button onClick={() => setLauncherOpen(true)}><Grid2X2 size={17} /> Apps</button></div>
+    {notification && <div className="toast" role="status"><Check size={15} />{notification}</div>}
   </main>;
 }
 
-function focusOrOpen(id: AppId, openApp: (id: AppId) => void, focusApp: (id: AppId) => void, windows: WindowRecord[]) {
-  if (windows.some(item => item.id === id && !item.minimized)) focusApp(id);
-  else openApp(id);
-}
-
-function WindowSection({ title, eyebrow, children, action }: { title: string; eyebrow?: string; children: ReactNode; action?: ReactNode }) {
-  return <section className="content-section">
-    <div className="section-heading"><div>{eyebrow && <span className="section-eyebrow">{eyebrow}</span>}<h2>{title}</h2></div>{action}</div>
-    {children}
-  </section>;
-}
-
-function WelcomeApp({ openApp }: { openApp: (id: AppId) => void }) {
-  return <div className="welcome-content">
-    <div className="welcome-copy">
-      <div className="welcome-overline"><span className="status-pip" /> PORTFOLIO WORKSPACE <span className="welcome-version">VERSION 4.0</span></div>
-      <h1>Hi, I'm <span>Atharv Pose.</span></h1>
-      <p className="welcome-role">IT undergraduate · Developer · Cybersecurity enthusiast</p>
-      <p className="welcome-description">I build practical software, investigate how systems work and experiment across code, hardware and creative technology.</p>
-      <div className="terminal-inline"><span>atharv@poserion:~$</span> whoami <i /></div>
-      <div className="welcome-actions">
-        <button className="primary-action" onClick={() => openApp('projects')}><FolderOpen size={15} /> Explore projects <ArrowUpRight size={14} /></button>
-        <button className="secondary-action" onClick={() => openApp('about')}><UserRound size={15} /> About me</button>
+function HomeApp({ openApp }: { openApp: (id: AppId) => void }) {
+  return <div className="app-scroll home-app">
+    <div className="home-hero">
+      <div className="home-copy">
+        <span className="eyebrow">WORKSPACE PROFILE</span>
+        <h1>Atharv <span>Pose</span></h1>
+        <p className="role-line">IT undergraduate · Independent developer · Cybersecurity enthusiast</p>
+        <p className="home-description">I build software, security tools and practical experiments. My work moves between OSINT, local-first AI, computer vision, web systems and small hardware projects.</p>
+        <div className="home-actions">
+          <button type="button" className="button-primary" onClick={() => openApp('projects')}>Explore projects <ArrowRight size={15} /></button>
+          <button type="button" className="button-secondary" onClick={() => openApp('about')}>About me</button>
+        </div>
+      </div>
+      <div className="home-mark-panel">
+        <img src="/brand/poserion-mark.png" alt="PoserionOS geometric mark" />
+        <span>PERSONAL WORKSPACE</span>
+        <strong>Research, build, understand.</strong>
       </div>
     </div>
-    <div className="welcome-side">
-      <div className="profile-mark"><img src="/brand/poserionos-mark.svg" alt="PoserionOS mark" /></div>
-      <span className="side-label">CURRENTLY EXPLORING</span>
-      <div className="interest-list"><span>Open-source intelligence</span><span>Computer vision</span><span>Embedded systems</span></div>
-      <button className="text-link" onClick={() => openApp('terminal')}>Open terminal <ChevronRight size={14} /></button>
+    <div className="home-content-grid">
+      <section className="home-card home-featured">
+        <SectionHeading eyebrow="SELECTED WORK" title="Projects" />
+        <div className="featured-project-list">
+          {projects.filter(project => project.featured).slice(0, 3).map((project, index) => <button type="button" key={project.id} className="featured-project" onClick={() => openApp('projects')}>
+            <span className="project-index">0{index + 1}</span><span className="featured-project-copy"><strong>{project.name}</strong><small>{project.description}</small></span><ArrowUpRight size={16} />
+          </button>)}
+        </div>
+        <button type="button" className="inline-link" onClick={() => openApp('projects')}>View all selected projects <ChevronRight size={15} /></button>
+      </section>
+      <section className="home-card home-focus">
+        <SectionHeading eyebrow="CURRENT INTERESTS" title="Areas I explore" />
+        <ul className="interest-list">
+          <li><ShieldCheck size={16} /><span><strong>Cybersecurity and OSINT</strong><small>Open-source research, privacy and system behaviour.</small></span></li>
+          <li><Code2 size={16} /><span><strong>Applied software and AI</strong><small>Useful applications, computer vision and local models.</small></span></li>
+          <li><Cpu size={16} /><span><strong>Hardware and systems</strong><small>Embedded boards, firmware, hosting and troubleshooting.</small></span></li>
+        </ul>
+        <button type="button" className="inline-link" onClick={() => openApp('lab')}>Open lab notes <ChevronRight size={15} /></button>
+      </section>
     </div>
+    <div className="home-footer-note"><span>INDEPENDENT PROJECTS</span><span>AI tools are part of the development workflow, not a substitute for engineering decisions.</span></div>
   </div>;
 }
 
-function ProjectsApp() {
+function ProjectsApp({ selectedProjectId, setSelectedProjectId }: { selectedProjectId: string | null; setSelectedProjectId: (id: string | null) => void }) {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const categories = ['All', 'Security', 'AI & Data', 'Spatial Computing', 'Systems', 'Web', 'Experiments'];
-  const visible = projects.filter(project => {
+  const [category, setCategory] = useState<'All' | ProjectCategory>('All');
+  const selectedProject = projects.find(project => project.id === selectedProjectId) ?? null;
+  const categories: Array<'All' | ProjectCategory> = ['All', 'Security', 'AI & Data', 'Spatial Computing', 'Systems', 'Web', 'Games'];
+  const visibleProjects = projects.filter(project => {
     const matchesCategory = category === 'All' || project.category === category;
     const text = `${project.name} ${project.description} ${project.stack.join(' ')}`.toLowerCase();
-    return matchesCategory && text.includes(query.toLowerCase());
+    return matchesCategory && text.includes(query.toLowerCase().trim());
   });
-  return <div className="projects-app app-scroll">
-    <WindowSection title="Selected work" eyebrow="PROJECT INDEX" action={<span className="result-count">{visible.length} PROJECTS</span>}>
-      <p className="section-intro">Independent builds and experiments across security, AI, spatial computing and software. AI tools assist parts of the workflow; the project direction, decisions and integration are mine.</p>
-      <label className="project-search"><Search size={15} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search projects, tools or topics" /></label>
-      <div className="filter-row">{categories.map(item => <button key={item} className={category === item ? 'filter-active' : ''} onClick={() => setCategory(item)}>{item}</button>)}</div>
-      <div className="project-grid">
-        {visible.map(project => <ProjectCard key={project.id} project={project} expanded={expanded === project.id} onToggle={() => setExpanded(expanded === project.id ? null : project.id)} />)}
+
+  if (selectedProject) return <div className="app-scroll project-detail-app">
+    <button type="button" className="back-link" onClick={() => setSelectedProjectId(null)}><ArrowLeft size={15} /> Back to projects</button>
+    <div className="detail-heading">
+      <div><span className="eyebrow">{selectedProject.category.toUpperCase()} / CASE STUDY</span><h2>{selectedProject.name}</h2><p>{selectedProject.description}</p></div>
+      <span className="status-label">{selectedProject.status}</span>
+    </div>
+    <div className="detail-body-grid">
+      <div className="detail-main-column">
+        <section className="detail-section"><h3>Overview</h3><p>{selectedProject.overview}</p></section>
+        <section className="detail-section"><h3>Approach</h3><ol className="approach-list">{selectedProject.approach.map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, '0')}</span><p>{step}</p></li>)}</ol></section>
+        <section className="detail-section"><h3>Implementation notes</h3><ul className="bullet-notes">{selectedProject.engineeringNotes.map(note => <li key={note}>{note}</li>)}</ul></section>
       </div>
-      {!visible.length && <div className="empty-state">No projects match that search. Try another term or category.</div>}
-    </WindowSection>
+      <aside className="detail-side-column">
+        <div className="detail-side-card"><span className="eyebrow">TECHNOLOGY</span><div className="tag-list">{selectedProject.stack.map(item => <span key={item}>{item}</span>)}</div></div>
+        <div className="detail-side-card"><span className="eyebrow">PROJECT STATE</span><strong>{selectedProject.status}</strong><p>{selectedProject.note}</p></div>
+        <div className="detail-links">
+          <a href={selectedProject.github} target="_blank" rel="noreferrer"><GitHubMark size={16} /> Source repository <ArrowUpRight size={14} /></a>
+          {selectedProject.live && <a href={selectedProject.live} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Live project <ArrowUpRight size={14} /></a>}
+        </div>
+      </aside>
+    </div>
+  </div>;
+
+  return <div className="app-scroll projects-app">
+    <SectionHeading eyebrow="PROJECT INDEX" title="Selected projects">
+      <span className="result-count">{visibleProjects.length} projects</span>
+    </SectionHeading>
+    <p className="section-intro">A curated set of repositories with documented functionality and meaningful implementation. Older forks, empty repositories and unfinished placeholders are left out.</p>
+    <label className="project-search"><Search size={16} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by project, tool or technology" /></label>
+    <div className="project-filters" role="group" aria-label="Filter projects by category">
+      {categories.map(item => <button type="button" key={item} className={category === item ? 'filter-active' : ''} onClick={() => setCategory(item)}>{item}</button>)}
+    </div>
+    <div className="project-grid">
+      {visibleProjects.map(project => <ProjectCard key={project.id} project={project} onOpen={() => setSelectedProjectId(project.id)} />)}
+      {visibleProjects.length === 0 && <div className="empty-state">No projects match this search.</div>}
+    </div>
+    <p className="content-footnote">Project descriptions are based on each repository's documentation. Prototype status is shown where the repository does not describe a production deployment.</p>
   </div>;
 }
 
-function ProjectCard({ project, expanded, onToggle }: { project: Project; expanded: boolean; onToggle: () => void }) {
-  const iconByCategory: Record<Project['category'], LucideIcon> = { Security: Shield, 'AI & Data': Sparkles, 'Spatial Computing': Globe2, Systems: Cpu, Web: Code2, Experiments: Zap };
-  const Icon = iconByCategory[project.category];
-  return <article className={`project-card ${expanded ? 'project-expanded' : ''}`}>
-    <div className="project-topline"><span className="project-icon"><Icon size={18} /></span><span className={`project-status status-${project.status.toLowerCase()}`}>{project.status}</span></div>
-    <div className="project-category">{project.category.toUpperCase()}</div>
+function ProjectCard({ project, onOpen }: { project: Project; onOpen: () => void }) {
+  return <article className="project-card">
+    <div className="project-card-top"><span className="project-category">{project.category}</span><span className="project-language">{project.language}</span></div>
     <h3>{project.name}</h3>
     <p>{project.description}</p>
-    <div className="stack-tags">{project.stack.slice(0, expanded ? 10 : 4).map(item => <span key={item}>{item}</span>)}</div>
-    {expanded && project.note && <p className="project-note">{project.note}</p>}
-    <div className="project-actions">
-      <a href={project.github} target="_blank" rel="noreferrer">Source code <ExternalLink size={13} /></a>
-      {project.live && <a href={project.live} target="_blank" rel="noreferrer">Live demo <ArrowUpRight size={13} /></a>}
-      <button onClick={onToggle}>{expanded ? 'Less' : 'Details'} <ChevronDown size={13} className={expanded ? 'rotate-chevron' : ''} /></button>
-    </div>
+    <div className="tag-list compact-tags">{project.stack.slice(0, 4).map(item => <span key={item}>{item}</span>)}{project.stack.length > 4 && <span>+{project.stack.length - 4}</span>}</div>
+    <div className="project-card-bottom"><span className="status-text">{project.status}</span><button type="button" onClick={onOpen}>Case study <ArrowUpRight size={14} /></button></div>
   </article>;
 }
 
-function AboutApp() {
+function AboutApp({ openApp }: { openApp: (id: AppId) => void }) {
   return <div className="app-scroll about-app">
-    <WindowSection title="A little context" eyebrow="WHOAMI">
-      <div className="about-lead"><div className="about-monogram">AP</div><div><h3>Atharv Pose</h3><p>Developer in progress. Systems curious by default.</p><span className="subtle-line">Mumbai Metropolitan Region, India</span></div></div>
-      <p className="body-copy">I'm an Information Technology undergraduate at Ratan Tata Maharashtra State Skills University. I learn best by building things, debugging them and understanding what happens below the surface.</p>
-      <p className="body-copy">My work moves between software engineering, cybersecurity and OSINT, AI-assisted tools, computer vision, hardware experiments and creative applications. I enjoy practical problems more than technology for its own sake.</p>
-      <div className="quote-panel"><span>WORKING PRINCIPLE</span><strong>Use the tool. Understand the system. Improve the result.</strong></div>
-    </WindowSection>
-    <WindowSection title="Education" eyebrow="BACKGROUND">
-      <div className="timeline-card"><span className="timeline-point" /><div><strong>{education.program}</strong><p>{education.institution}</p><span>{education.period} · {education.location}</span></div></div>
-    </WindowSection>
-    <WindowSection title="Outside the code editor" eyebrow="INTERESTS">
-      <div className="interest-cards">
-        <InterestCard icon={Shield} title="Security & OSINT" text="Learning how systems expose information, how digital footprints connect, and how to research responsibly." />
-        <InterestCard icon={Gamepad2} title="Games & modding" text="Gaming, Minecraft server hosting, configuration and modding. I enjoy the systems behind the experience." />
-        <InterestCard icon={Cpu} title="Hardware" text="Microcontrollers, low-cost electronics, firmware research and building practical devices." />
-        <InterestCard icon={Clapperboard} title="Creative tools" text="Video editing, visual effects, image work and 3D tools as another form of problem solving." />
-      </div>
-    </WindowSection>
+    <SectionHeading eyebrow="PROFILE" title="About Atharv" />
+    <div className="about-intro">
+      <div className="about-monogram"><img src="/brand/poserion-mark.png" alt="" /></div>
+      <div><h3>Atharv Pose</h3><p>Information Technology student at Ratan Tata Maharashtra State Skills University.</p><span className="about-location">Mumbai Metropolitan Region, India</span></div>
+    </div>
+    <div className="about-columns">
+      <section className="info-panel"><h3>How I work</h3><p>I learn by building and testing things. I like projects that require me to understand the whole system, from the interface to data flow, deployment and the environment it runs in.</p><p>I develop my projects independently and use AI tools as part of my workflow for research, iteration and debugging. I still care about understanding the implementation and its trade-offs.</p></section>
+      <section className="info-panel"><h3>Education</h3><strong>{education.institution}</strong><p>{education.programme}</p><p>{education.period}</p><small>{education.location}</small></section>
+    </div>
+    <section className="about-areas"><span className="eyebrow">AREAS OF INTEREST</span><div className="interest-chip-list"><span>Cybersecurity</span><span>OSINT</span><span>Computer vision</span><span>Local-first AI</span><span>Embedded systems</span><span>Linux and servers</span><span>Game modding</span><span>Creative software</span></div></section>
+    <div className="about-actions"><button type="button" className="button-primary" onClick={() => openApp('projects')}>Explore my work <ArrowRight size={15} /></button><button type="button" className="button-secondary" onClick={() => openApp('contact')}>Contact</button></div>
   </div>;
 }
 
-function InterestCard({ icon: Icon, title, text }: { icon: LucideIcon; title: string; text: string }) {
-  return <article className="interest-card"><Icon size={18} /><strong>{title}</strong><p>{text}</p></article>;
-}
-
-function SkillsApp() {
-  return <div className="app-scroll skills-app">
-    <WindowSection title="Tools I work with" eyebrow="TOOLKIT">
-      <p className="section-intro">A practical snapshot of technologies used across projects, experiments and personal setups. This is not a proficiency ranking.</p>
-      <div className="skill-groups">
-        {skillGroups.map((group, index) => <section key={group.name} className="skill-group"><div className="skill-group-heading"><span className="skill-index">0{index + 1}</span><h3>{group.name}</h3><span className="skill-count">{group.items.length} ITEMS</span></div><div className="skill-pills">{group.items.map(item => <span key={item}>{item}</span>)}</div></section>)}
-      </div>
-      <div className="learning-note"><Info size={16} /><p>Some entries are used in active projects, while others come from personal experiments or current learning. The project cards show where specific tools are used.</p></div>
-    </WindowSection>
+function ToolkitApp() {
+  return <div className="app-scroll toolkit-app">
+    <SectionHeading eyebrow="TOOLKIT" title="Technologies and tools" />
+    <p className="section-intro">This is a working list of technologies I have used or explored in projects, hosting, troubleshooting and personal experiments. It is not a proficiency ranking.</p>
+    <div className="toolkit-grid">
+      {skillGroups.map((group, index) => <section className="toolkit-card" key={group.name}>
+        <div className="toolkit-card-heading"><span className="toolkit-index">{String(index + 1).padStart(2, '0')}</span><h3>{group.name}</h3></div>
+        <p>{group.intro}</p>
+        <div className="tag-list">{group.items.map(item => <span key={item}>{item}</span>)}</div>
+      </section>)}
+    </div>
   </div>;
 }
 
-function CertificatesApp() {
+function CredentialsApp() {
   return <div className="app-scroll credentials-app">
-    <WindowSection title="Learning record" eyebrow="CERTIFICATES">
-      <p className="section-intro">Selected courses and verified certificates listed on my LinkedIn profile. Credential details and issuer records should be checked at the source.</p>
-      <div className="certificate-list">{certificates.map((certificate, index) => <article className="certificate-row" key={certificate.name}><span className="certificate-index">{String(index + 1).padStart(2, '0')}</span><div><strong>{certificate.name}</strong><span>{certificate.issuer}</span></div><Award size={17} /></article>)}</div>
-      <a className="external-credential" href={`${contact.linkedin}/details/certifications/`} target="_blank" rel="noreferrer">View LinkedIn certifications <ArrowUpRight size={14} /></a>
-    </WindowSection>
-    <WindowSection title="Events & milestones" eyebrow="PARTICIPATION">
-      <div className="milestone-card"><span className="milestone-label">1ST PRIZE</span><div><strong>RTMSSU Foundation Day Week Hackathon 2026</strong><p>Hackathon recognition. Physical award documentation is not embedded in this site yet.</p></div></div>
-      <div className="milestone-card"><span className="milestone-label">PARTICIPANT</span><div><strong>AMD Slingshot Campus Ideathon 2026</strong><p>Campus ideation event.</p></div></div>
-      <div className="milestone-card"><span className="milestone-label">PARTICIPANT</span><div><strong>Bharatiya Antariksh Hackathon 2026</strong><p>Space and technology focused hackathon.</p></div></div>
-    </WindowSection>
+    <SectionHeading eyebrow="LEARNING RECORD" title="Credentials and milestones" />
+    <p className="section-intro">Certificates listed on my LinkedIn profile. Physical event certificates and award photographs are not hosted here unless a public verification link is available.</p>
+    <div className="credential-list">
+      {certificates.map((certificate, index) => <article className="credential-card" key={certificate.name}>
+        <span className="credential-index">{String(index + 1).padStart(2, '0')}</span>
+        <div><h3>{certificate.name}</h3><p>{certificate.issuer}</p><small>{certificate.category}</small></div>
+      </article>)}
+    </div>
+    <SectionHeading eyebrow="EVENTS" title="Hackathons and participation" />
+    <div className="milestone-list">
+      {milestones.map(item => <article className="milestone-card" key={item.title}><span>{item.date}</span><div><strong>{item.title}</strong><p>{item.detail}</p></div></article>)}
+    </div>
+    <a className="profile-reference" href="https://www.linkedin.com/in/atharv-pose" target="_blank" rel="noreferrer"><LinkedInMark /> Open LinkedIn profile <ArrowUpRight size={14} /></a>
   </div>;
 }
 
-function TerminalApp({ openApp, setTheme, notify }: { openApp: (id: AppId) => void; setTheme: (theme: Theme) => void; notify: (message: string) => void }) {
-  const [input, setInput] = useState('');
-  const [lines, setLines] = useState<Array<{ type: 'command' | 'output' | 'error'; text: string }>>([
-    { type: 'output', text: 'PoserionOS shell 4.0. Type help to see available commands.' },
-    { type: 'output', text: 'This is a portfolio interface, not a real system terminal.' }
-  ]);
-  const endRef = useRef<HTMLDivElement>(null);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [lines]);
+function LinkedInMark() { return <span className="linkedin-mark" aria-hidden="true">in</span>; }
 
-  const execute = (raw: string) => {
-    const command = raw.trim();
-    if (!command) return;
-    const [base, arg] = command.toLowerCase().split(/\s+/, 2);
-    const out = (text: string, type: 'output' | 'error' = 'output') => setLines(current => [...current, { type, text }]);
-    setLines(current => [...current, { type: 'command', text: command }]);
-    switch (base) {
-      case 'help': out('whoami  about  projects  skills  certificates  contact  open <app>  theme <kali|nord>  clear'); break;
-      case 'whoami': out('Atharv Pose | B.Tech IT undergraduate | Developer | Cybersecurity and OSINT enthusiast'); break;
-      case 'about': openApp('about'); out('Opening profile...'); break;
-      case 'projects': openApp('projects'); out(`${projects.length} selected projects indexed. Opening project explorer...`); break;
-      case 'skills': openApp('skills'); out('Opening toolkit...'); break;
-      case 'certificates': case 'certs': openApp('certificates'); out('Opening learning record...'); break;
-      case 'contact': openApp('contact'); out('Opening contact panel...'); break;
-      case 'open': {
-        const map: Record<string, AppId> = { welcome: 'welcome', home: 'welcome', projects: 'projects', about: 'about', skills: 'skills', certificates: 'certificates', certs: 'certificates', settings: 'settings', contact: 'contact', files: 'files', lab: 'lab' };
-        if (arg && map[arg]) { openApp(map[arg]); out(`Opening ${map[arg]}...`); }
-        else out('Available apps: welcome, projects, about, skills, certificates, settings, contact, files, lab', 'error');
-        break;
-      }
-      case 'theme':
-        if (arg === 'kali' || arg === 'nord') { setTheme(arg); out(`Theme changed to ${arg}.`); notify(`${arg === 'kali' ? 'Kali Blue' : 'Nord'} theme applied`); }
-        else out('Usage: theme kali | theme nord', 'error');
-        break;
-      case 'clear': setLines([]); return;
-      case 'sudo': out('This portfolio shell does not provide system access.', 'error'); break;
-      case 'ls': out('about/  projects/  toolkit/  certificates/  contact/  lab-notes/'); break;
-      case 'pwd': out('/home/atharv/portfolio'); break;
-      case 'date': out(new Date().toString()); break;
-      case 'exit': out('There is no underlying shell session to exit.'); break;
-      default: out(`Command not found: ${base}. Type help for available commands.`, 'error');
+function TerminalApp({ openApp, preferences, setPreferences }: { openApp: (id: AppId) => void; preferences: Preferences; setPreferences: (preferences: Preferences) => void }) {
+  type Line = { kind: 'input' | 'output' | 'muted'; text: string };
+  const [lines, setLines] = useState<Line[]>([
+    { kind: 'muted', text: 'PoserionOS portfolio shell' },
+    { kind: 'muted', text: 'This terminal runs portfolio shortcuts only. It does not access the visitor device.' },
+    { kind: 'output', text: 'Type help to list the available commands.' }
+  ]);
+  const [input, setInput] = useState('');
+  const endRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' }); }, [lines]);
+
+  const execute = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    const [command, ...args] = trimmed.toLowerCase().split(/\s+/);
+    const output = (text: string) => setLines(current => [...current, { kind: 'input', text: `atharv@poserion:~$ ${trimmed}` }, { kind: 'output', text }]);
+    if (command === 'clear') { setLines([]); return; }
+    if (command === 'help') output('whoami | projects | skills | socials | theme kali|nord | open <app> | date | clear');
+    else if (command === 'whoami') output('Atharv Pose\nB.Tech Information Technology\nIndependent developer, cybersecurity and OSINT enthusiast.');
+    else if (command === 'projects' || command === 'ls') output(projects.map(project => `${project.id.padEnd(18)} ${project.name}`).join('\n'));
+    else if (command === 'skills') output(skillGroups.map(group => `${group.name}: ${group.items.slice(0, 8).join(', ')}`).join('\n'));
+    else if (command === 'socials') output(`GitHub: ${contact.github}\nLinkedIn: ${contact.linkedin}\nEmail: ${contact.email}`);
+    else if (command === 'date') output(new Date().toString());
+    else if (command === 'theme') {
+      const next = args[0] === 'nord' ? 'nord' : args[0] === 'kali' ? 'kali' : null;
+      if (!next) output('Usage: theme kali | theme nord');
+      else { setPreferences({ ...preferences, theme: next }); output(`Theme changed to ${next}.`); }
     }
+    else if (command === 'open') {
+      const name = args.join(' ');
+      const match = (Object.keys(appMeta) as AppId[]).find(id => id === name || appMeta[id].short.toLowerCase() === name || appMeta[id].title.toLowerCase() === name);
+      if (match) { output(`Opening ${appMeta[match].title}.`); openApp(match); }
+      else output(`No application named "${name}". Type help to see available commands.`);
+    }
+    else output(`Command not found: ${command}. Type help for available commands.`);
+    setLines(current => current.slice(-90));
   };
 
   return <div className="terminal-app">
-    <div className="terminal-toolbar"><span className="terminal-leds"><i /><i /><i /></span><span>atharv@poserion: ~</span><span className="terminal-toolbar-right">PORTFOLIO SHELL</span></div>
-    <div className="terminal-screen" onClick={() => document.getElementById('terminal-command')?.focus()}>
-      <div className="terminal-ascii"> <span>┌──────────────────────────────────────────┐</span>{'\n'} <span>│ POSERIONOS 4.0  /  ATHARV POSE           │</span>{'\n'} <span>└──────────────────────────────────────────┘</span></div>
-      {lines.map((line, index) => <div className={`terminal-line terminal-${line.type}`} key={`${index}-${line.text}`}>{line.type === 'command' ? <><b>atharv@poserion:~$</b> {line.text}</> : line.text}</div>)}
-      <div className="terminal-input-line"><b>atharv@poserion:~$</b><form onSubmit={event => { event.preventDefault(); execute(input); setInput(''); }}><input id="terminal-command" value={input} onChange={event => setInput(event.target.value)} spellCheck={false} autoComplete="off" aria-label="Terminal command" placeholder="type help" /></form><span className="terminal-cursor" /></div>
+    <div className="terminal-toolbar"><span><span className="terminal-prompt-dot" /> atharv@poserion</span><span>PORTFOLIO SHELL</span></div>
+    <div className="terminal-output" onClick={() => document.getElementById('terminal-input')?.focus()}>
+      {lines.map((line, index) => <pre key={`${index}-${line.text}`} className={`terminal-line terminal-${line.kind}`}>{line.text}</pre>)}
+      <form className="terminal-form" onSubmit={event => { event.preventDefault(); execute(input); setInput(''); }}>
+        <span className="terminal-prompt">atharv@poserion:~$</span>
+        <input id="terminal-input" value={input} onChange={event => setInput(event.target.value)} spellCheck={false} autoComplete="off" aria-label="Portfolio terminal command" />
+      </form>
       <div ref={endRef} />
     </div>
-    <div className="terminal-footer"><span>LOCAL INTERFACE</span><span>CTRL + K TO OPEN APPS</span></div>
+    <div className="terminal-footer"><span>LOCAL PORTFOLIO COMMANDS</span><span>CTRL + ALT + T</span></div>
   </div>;
 }
 
-function SettingsApp({ theme, setTheme, wallpaper, setWallpaper }: { theme: Theme; setTheme: (theme: Theme) => void; wallpaper: Wallpaper; setWallpaper: (wallpaper: Wallpaper) => void }) {
-  return <div className="app-scroll settings-app">
-    <WindowSection title="Appearance" eyebrow="PERSONALIZATION">
-      <div className="settings-block"><div className="settings-block-heading"><div><strong>Color scheme</strong><span>Switch between the two workspace palettes.</span></div><Palette size={18} /></div>
-        <div className="theme-options">
-          <button className={`theme-choice kali-choice ${theme === 'kali' ? 'theme-choice-active' : ''}`} onClick={() => setTheme('kali')}><span className="theme-swatch"><i /><i /><i /></span><strong>Kali Blue</strong><small>Deep navy with electric blue accents</small>{theme === 'kali' && <Check size={15} />}</button>
-          <button className={`theme-choice nord-choice ${theme === 'nord' ? 'theme-choice-active' : ''}`} onClick={() => setTheme('nord')}><span className="theme-swatch"><i /><i /><i /></span><strong>Nord</strong><small>Muted blue-grey and ice accents</small>{theme === 'nord' && <Check size={15} />}</button>
-        </div>
+function PlacesApp({ openApp }: { openApp: (id: AppId) => void }) {
+  const locations: Array<{ id: AppId; name: string; path: string; description: string; icon: LucideIcon }> = [
+    { id: 'home', name: 'Home', path: '/home/atharv', description: 'Workspace overview and recent work.', icon: Home },
+    { id: 'projects', name: 'Projects', path: '/home/atharv/Projects', description: 'Selected repositories and case studies.', icon: FolderOpen },
+    { id: 'toolkit', name: 'Toolkit', path: '/home/atharv/Toolkit', description: 'Languages, frameworks and tools.', icon: Code2 },
+    { id: 'credentials', name: 'Credentials', path: '/home/atharv/Credentials', description: 'Certificates and event milestones.', icon: Award },
+    { id: 'lab', name: 'Lab Notes', path: '/home/atharv/Lab', description: 'Hardware, game hosting and creative work.', icon: Cpu },
+    { id: 'about', name: 'About', path: '/home/atharv/About', description: 'Profile and education.', icon: UserRound }
+  ];
+  const [activePlace, setActivePlace] = useState<AppId>('home');
+  const active = locations.find(item => item.id === activePlace) ?? locations[0];
+  return <div className="places-app">
+    <div className="places-pathbar"><span><Folder size={14} /> {active.path}</span><small>LOCAL PORTFOLIO INDEX</small></div>
+    <div className="places-layout">
+      <aside className="places-sidebar" aria-label="Places navigation">
+        <span className="eyebrow">PLACES</span>
+        {locations.map(location => {
+          const Icon = location.icon;
+          return <button key={location.id} type="button" className={activePlace === location.id ? 'place-active' : ''} onClick={() => setActivePlace(location.id)}><Icon size={15} /><span>{location.name}</span></button>;
+        })}
+        <div className="places-sidebar-footer"><span>LOCATION</span><strong>This browser</strong><small>No server-side settings</small></div>
+      </aside>
+      <div className="places-main">
+        <div className="places-main-heading"><div><span className="eyebrow">DIRECTORY</span><h2>{active.name}</h2></div><small>{activePlace === 'home' ? `${locations.length - 1} locations` : '1 location'}</small></div>
+        {activePlace === 'home' ? <div className="places-grid">
+          {locations.filter(item => item.id !== 'home').map(location => {
+            const Icon = location.icon;
+            return <button type="button" className="place-folder-card" key={location.id} onClick={() => setActivePlace(location.id)}>
+              <Icon size={25} /><strong>{location.name}</strong><small>{location.description}</small><code>{location.path}</code>
+            </button>;
+          })}
+        </div> : <div className="places-selected">
+          <div className="places-file-row"><span className="file-row-icon"><active.icon size={21} /></span><div><strong>{active.name}</strong><small>{active.description}</small></div><button type="button" onClick={() => openApp(activePlace)}>Open <ArrowUpRight size={14} /></button></div>
+          <p className="places-note">Select Open to launch this application in its own window.</p>
+        </div>}
       </div>
-      <div className="settings-block"><div className="settings-block-heading"><div><strong>Desktop wallpaper</strong><span>Your selected image is the default background.</span></div><Laptop size={18} /></div>
-        <div className="wallpaper-options">
-          <button className={`wallpaper-choice railway-preview ${wallpaper === 'railway' ? 'wallpaper-choice-active' : ''}`} onClick={() => setWallpaper('railway')}><span /><strong>Railway Crossing</strong><small>Selected image</small>{wallpaper === 'railway' && <Check size={14} />}</button>
-          <button className={`wallpaper-choice nord-preview ${wallpaper === 'nord-dusk' ? 'wallpaper-choice-active' : ''}`} onClick={() => setWallpaper('nord-dusk')}><span /><strong>Nord Dusk</strong><small>Built-in gradient</small>{wallpaper === 'nord-dusk' && <Check size={14} />}</button>
-          <button className={`wallpaper-choice kali-preview ${wallpaper === 'kali-grid' ? 'wallpaper-choice-active' : ''}`} onClick={() => setWallpaper('kali-grid')}><span /><strong>Kali Grid</strong><small>Built-in gradient</small>{wallpaper === 'kali-grid' && <Check size={14} />}</button>
-        </div>
-      </div>
-      <p className="settings-footnote"><Info size={14} /> Appearance preferences are saved in this browser only.</p>
-    </WindowSection>
+    </div>
   </div>;
+}
+
+function SettingsApp({ preferences, updatePreference, resetPreferences }: {
+  preferences: Preferences;
+  updatePreference: <K extends keyof Preferences>(key: K, value: Preferences[K]) => void;
+  resetPreferences: () => void;
+}) {
+  const [section, setSection] = useState<'appearance' | 'desktop' | 'about'>('appearance');
+  return <div className="settings-app">
+    <aside className="settings-sidebar">
+      <span className="eyebrow">SETTINGS</span>
+      <button type="button" className={section === 'appearance' ? 'settings-nav-active' : ''} onClick={() => setSection('appearance')}><Palette size={16} /> Appearance</button>
+      <button type="button" className={section === 'desktop' ? 'settings-nav-active' : ''} onClick={() => setSection('desktop')}><Monitor size={16} /> Desktop</button>
+      <button type="button" className={section === 'about' ? 'settings-nav-active' : ''} onClick={() => setSection('about')}><Info size={16} /> About device</button>
+      <div className="settings-sidebar-footer"><small>Preferences are stored locally in this browser.</small></div>
+    </aside>
+    <div className="settings-content">
+      {section === 'appearance' && <>
+        <SectionHeading eyebrow="PERSONALIZATION" title="Appearance" />
+        <div className="settings-section"><div className="settings-section-heading"><div><h3>Color theme</h3><p>Choose the interface palette used by windows and controls.</p></div><Palette size={17} /></div>
+          <div className="theme-choice-grid">
+            <button type="button" className={`theme-choice theme-choice-kali ${preferences.theme === 'kali' ? 'choice-selected' : ''}`} onClick={() => updatePreference('theme', 'kali')}><span className="theme-swatch"><i /><i /><i /></span><strong>Kali Blue</strong><small>Deep blue surfaces and clear cyan accents</small>{preferences.theme === 'kali' && <Check size={16} />}</button>
+            <button type="button" className={`theme-choice theme-choice-nord ${preferences.theme === 'nord' ? 'choice-selected' : ''}`} onClick={() => updatePreference('theme', 'nord')}><span className="theme-swatch"><i /><i /><i /></span><strong>Nord</strong><small>Muted blue-grey and ice accents</small>{preferences.theme === 'nord' && <Check size={16} />}</button>
+          </div>
+        </div>
+        <div className="settings-section"><div className="settings-section-heading"><div><h3>Accent colour</h3><p>Change selection states and active controls.</p></div><Zap size={17} /></div>
+          <div className="accent-options">
+            <button type="button" className={`accent-choice accent-blue ${preferences.accent === 'blue' ? 'accent-selected' : ''}`} onClick={() => updatePreference('accent', 'blue')}><span />Blue</button>
+            <button type="button" className={`accent-choice accent-cyan ${preferences.accent === 'cyan' ? 'accent-selected' : ''}`} onClick={() => updatePreference('accent', 'cyan')}><span />Cyan</button>
+            <button type="button" className={`accent-choice accent-violet ${preferences.accent === 'violet' ? 'accent-selected' : ''}`} onClick={() => updatePreference('accent', 'violet')}><span />Violet</button>
+          </div>
+        </div>
+      </>}
+      {section === 'desktop' && <>
+        <SectionHeading eyebrow="DESKTOP" title="Wallpaper and layout" />
+        <div className="settings-section"><div className="settings-section-heading"><div><h3>Wallpaper library</h3><p>Images are bundled with the site. Your selection stays in this browser.</p></div><Laptop size={17} /></div>
+          <div className="wallpaper-grid">
+            {wallpaperLibrary.map(item => <button type="button" className={`wallpaper-option ${preferences.wallpaper === item.id ? 'wallpaper-selected' : ''}`} key={item.id} onClick={() => updatePreference('wallpaper', item.id)}>
+              <img src={item.file} alt="" loading="lazy" /><span className="wallpaper-option-label"><strong>{item.name}</strong><small>{item.description}</small></span>{preferences.wallpaper === item.id && <span className="wallpaper-check"><Check size={14} /></span>}
+            </button>)}
+          </div>
+        </div>
+        <div className="settings-section"><div className="settings-section-heading"><div><h3>Desktop elements</h3><p>Keep only the shortcuts and widgets you use.</p></div><PanelLeft size={17} /></div>
+          <ToggleRow label="Information widgets" detail="Show the local clock and current focus cards." checked={preferences.showWidgets} onChange={value => updatePreference('showWidgets', value)} />
+          <ToggleRow label="Desktop shortcuts" detail="Show quick links for Projects, About and Terminal." checked={preferences.showShortcuts} onChange={value => updatePreference('showShortcuts', value)} />
+          <ToggleRow label="Reduce motion" detail="Limit interface transitions and animated feedback." checked={preferences.reduceMotion} onChange={value => updatePreference('reduceMotion', value)} />
+        </div>
+      </>}
+      {section === 'about' && <DeviceApp compact />}
+      <div className="settings-footer"><span>Saved in this browser only. No account or server sync.</span><button type="button" className="button-secondary" onClick={resetPreferences}><RotateCcw size={14} /> Reset to defaults</button></div>
+    </div>
+  </div>;
+}
+
+function ToggleRow({ label, detail, checked, onChange }: { label: string; detail: string; checked: boolean; onChange: (value: boolean) => void }) {
+  return <label className="toggle-row"><span><strong>{label}</strong><small>{detail}</small></span><input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)} /><i aria-hidden="true" /></label>;
 }
 
 function ContactApp() {
   const links = [
-    { title: 'Email', value: contact.email, href: `mailto:${contact.email}`, icon: Mail, note: 'Best for direct enquiries' },
-    { title: 'GitHub', value: 'github.com/Atharv3142M', href: contact.github, icon: Github, note: 'Code, experiments and repositories' },
-    { title: 'LinkedIn', value: 'linkedin.com/in/atharv-pose', href: contact.linkedin, icon: Linkedin, note: 'Professional profile and credentials' },
-    { title: 'Holopin', value: 'holopin.io/@atharv3142m', href: contact.holopin, icon: Award, note: 'Open-source and community badges' }
+    { name: 'Email', value: contact.email, href: `mailto:${contact.email}`, icon: Mail, detail: 'Direct email' },
+    { name: 'GitHub', value: 'github.com/Atharv3142M', href: contact.github, icon: GitHubMark, detail: 'Code and project repositories' },
+    { name: 'LinkedIn', value: 'linkedin.com/in/atharv-pose', href: contact.linkedin, icon: UserRound, detail: 'Professional profile and certificates' },
+    { name: 'Holopin', value: 'holopin.io/@atharv3142m', href: contact.holopin, icon: Award, detail: 'Community badges' }
   ];
   return <div className="app-scroll contact-app">
-    <WindowSection title="Start a conversation" eyebrow="CONTACT">
-      <p className="section-intro">Have a project idea, a useful technical resource or an interesting problem to solve? Reach out through one of these channels.</p>
-      <div className="contact-list">{links.map(link => { const Icon = link.icon; return <a className="contact-link-card" key={link.title} href={link.href} target={link.title === 'Email' ? undefined : '_blank'} rel={link.title === 'Email' ? undefined : 'noreferrer'}><span className="contact-link-icon"><Icon size={19} /></span><span className="contact-link-text"><strong>{link.title}</strong><span>{link.value}</span><small>{link.note}</small></span><ArrowUpRight size={16} /></a>; })}</div>
-      <div className="availability-note"><span className="status-pip" /><div><strong>Open to meaningful collaboration</strong><p>Especially around software, security, open-source projects and practical experiments.</p></div></div>
-    </WindowSection>
-  </div>;
-}
-
-function FilesApp({ openApp }: { openApp: (id: AppId) => void }) {
-  const places: Array<{ id: AppId; name: string; path: string; icon: LucideIcon; description: string }> = [
-    { id: 'projects', name: 'Projects', path: '/home/atharv/Projects', icon: FolderOpen, description: `${projects.length} selected repositories and experiments` },
-    { id: 'about', name: 'About', path: '/home/atharv/About', icon: UserRound, description: 'Profile, education and interests' },
-    { id: 'skills', name: 'Toolkit', path: '/home/atharv/Toolkit', icon: Layers, description: 'Technologies and tools' },
-    { id: 'certificates', name: 'Credentials', path: '/home/atharv/Credentials', icon: Award, description: 'Certificates and milestones' },
-    { id: 'lab', name: 'Lab Notes', path: '/home/atharv/Lab', icon: Cpu, description: 'Hardware, games and creative work' }
-  ];
-  return <div className="files-app">
-    <div className="file-toolbar"><span><Folder size={14} /> /home/atharv</span><span>LOCAL PORTFOLIO INDEX</span></div>
-    <div className="file-layout"><aside className="file-sidebar"><span>PLACES</span>{['Home', 'Projects', 'Toolkit', 'Credentials', 'Lab Notes'].map(item => <div key={item}><Folder size={14} />{item}</div>)}</aside><div className="file-main"><div className="file-main-heading"><span>Home</span><small>5 locations</small></div><div className="file-grid">{places.map(place => { const Icon = place.icon; return <button key={place.id} onDoubleClick={() => openApp(place.id)} onClick={() => openApp(place.id)}><Icon size={27} /><strong>{place.name}</strong><small>{place.description}</small><code>{place.path}</code></button>; })}</div></div></div>
+    <SectionHeading eyebrow="CONTACT" title="Start a conversation" />
+    <p className="section-intro">For project discussions, collaboration, technical conversations or opportunities, use one of the links below.</p>
+    <div className="contact-list">
+      {links.map(item => { const Icon = item.icon; return <a className="contact-link" key={item.name} href={item.href} target={item.name === 'Email' ? undefined : '_blank'} rel={item.name === 'Email' ? undefined : 'noreferrer'}>
+        <span className="contact-icon"><Icon size={19} /></span><span className="contact-copy"><strong>{item.name}</strong><small>{item.value}</small><em>{item.detail}</em></span><ArrowUpRight size={16} />
+      </a>; })}
+    </div>
+    <div className="contact-note"><span className="contact-note-icon"><Info size={16} /></span><p>I do not publish a personal photograph. The PoserionOS mark is used as the visual identity for this workspace.</p></div>
   </div>;
 }
 
 function LabApp() {
+  const cards = [
+    { icon: Cpu, label: 'EMBEDDED AND HARDWARE', title: 'ApexZero exploration', text: 'Researching a low-cost portable electronics and security multi-tool. Current interests include ESP32 boards, displays, firmware and practical component selection.', state: 'Early hardware research' },
+    { icon: HardDrive, label: 'SYSTEMS AND HOSTING', title: 'Servers and environments', text: 'Setting up Minecraft servers, configuring hosting environments, troubleshooting Windows and Linux systems, and learning how services behave under real use.', state: 'Hands-on experiments' },
+    { icon: Gamepad2, label: 'GAMES AND MODDING', title: 'Minecraft and game systems', text: 'Minecraft modding, server configuration and game-related tooling. I enjoy understanding how the pieces fit together, not only playing the game.', state: 'Personal interest' },
+    { icon: Clapperboard, label: 'CREATIVE SOFTWARE', title: 'Editing and visual work', text: 'Using video editors, image tools and 3D software for personal projects. FFmpeg is part of the workflow for media processing and automation.', state: 'Creative experiments' }
+  ];
   return <div className="app-scroll lab-app">
-    <WindowSection title="Experiments outside the browser" eyebrow="LAB NOTES">
-      <p className="section-intro">The workbench is not limited to web applications. These are personal areas of exploration that inform how I approach technology.</p>
-      <div className="lab-grid">
-        <article className="lab-card"><div className="lab-icon"><Cpu size={20} /></div><span>EMBEDDED & HARDWARE</span><h3>Small boards, practical devices</h3><p>Exploring ESP32-based projects, microcontrollers, component selection, firmware and low-cost electronics. Poserion ZERO is the current multi-tool concept.</p></article>
-        <article className="lab-card"><div className="lab-icon"><HardDrive size={20} /></div><span>SERVERS & SYSTEMS</span><h3>Learning by hosting</h3><p>Personal experience setting up and maintaining game servers, configuring software, troubleshooting environments and working with Windows and Linux systems.</p></article>
-        <article className="lab-card"><div className="lab-icon"><Gamepad2 size={20} /></div><span>GAMES & MODDING</span><h3>Understanding game systems</h3><p>Minecraft server hosting, modding and configuration. Gaming is both a hobby and a way to explore how communities and interactive systems are built.</p></article>
-        <article className="lab-card"><div className="lab-icon"><Sparkles size={20} /></div><span>CREATIVE TECHNOLOGY</span><h3>Editing, motion and visuals</h3><p>Exploring video editing, visual effects, image editing and 3D tools. Creative workflows complement the engineering side of building usable experiences.</p></article>
-      </div>
-      <div className="lab-footer"><span>PERSONAL WORKBENCH</span><span>BUILD SMALL. LEARN OFTEN.</span></div>
-    </WindowSection>
+    <SectionHeading eyebrow="WORKBENCH" title="Lab notes" />
+    <p className="section-intro">Not every experiment becomes a public repository. These are the practical areas that influence how I approach technical work.</p>
+    <div className="lab-grid">{cards.map(card => { const Icon = card.icon; return <article className="lab-card" key={card.title}><span className="lab-icon"><Icon size={19} /></span><span className="eyebrow">{card.label}</span><h3>{card.title}</h3><p>{card.text}</p><small>{card.state}</small></article>; })}</div>
+  </div>;
+}
+
+function DeviceApp({ compact = false }: { compact?: boolean }) {
+  const info = [
+    ['Workspace', 'PoserionOS portfolio'],
+    ['Runtime', 'Browser-based interface'],
+    ['Preferences', 'Stored in localStorage'],
+    ['Network services', 'No portfolio backend'],
+    ['Analytics', 'No visitor analytics configured'],
+    ['Profile image', 'Not used']
+  ];
+  return <div className={`app-scroll device-app ${compact ? 'device-app-compact' : ''}`}>
+    {!compact && <SectionHeading eyebrow="SYSTEM INFORMATION" title="About this device" />}
+    <div className="device-identity"><img src="/brand/poserion-mark.png" alt="" /><div><strong>PoserionOS</strong><span>Personal portfolio environment</span></div></div>
+    <div className="device-info-grid">{info.map(([label, value]) => <div key={label}><small>{label}</small><strong>{value}</strong></div>)}</div>
+    <div className="device-privacy"><ShieldCheck size={17} /><p>Theme, wallpaper and display preferences are saved on this device. The site does not sync those preferences to a server.</p></div>
+    {!compact && <p className="device-note">PoserionOS is an interactive portfolio interface running in a browser. It does not execute shell commands or inspect private device telemetry.</p>}
   </div>;
 }
 

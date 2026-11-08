@@ -1,5 +1,8 @@
 node_modules/
 dist/
-*.log
+*.tsbuildinfo
+.vite/
 .DS_Store
-.vscode/
+DEPLOYMENT.md
+DESIGN.md
+VALIDATION.md

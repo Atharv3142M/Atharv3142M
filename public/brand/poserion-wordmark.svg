@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-labelledby="title">
+  <title id="title">PoserionOS</title>
+  <g transform="translate(0 0)">
+    <path d="M11 22V11h31l11 11v18" fill="none" stroke="#4d91ff" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+    <path d="M17 51V17h19.5c9.1 0 14 4.6 14 12.2S45.6 41 36.5 41H17" fill="none" stroke="#65d4df" stroke-width="5.5" stroke-linecap="square" stroke-linejoin="miter"/>
+    <path d="M42 52h11" fill="none" stroke="#4d91ff" stroke-width="5" stroke-linecap="square"/>
+  </g>
+  <text x="76" y="36" fill="#eaf0f8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="650" letter-spacing="1.2">POSERION</text>
+  <text x="225" y="36" fill="#65d4df" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="650">OS</text>
+</svg>

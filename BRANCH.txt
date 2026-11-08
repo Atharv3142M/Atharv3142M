@@ -1,3 +1,0 @@
-Target Git branch: portfolio-site
-Base branch: main
-Live branch: main (unchanged during this local build)
